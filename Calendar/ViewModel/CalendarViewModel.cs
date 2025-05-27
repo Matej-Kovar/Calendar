@@ -13,35 +13,50 @@ namespace Calendar.ViewModel
 {
     public class CalendarViewModel : INotifyPropertyChanged
     {
-        public ObservableCollection<CalendarDay> Days { get; set; } = new ObservableCollection<CalendarDay>();
+        public List<CalendarDay> Days { get; set; } = new List<CalendarDay>();
+        public List<DayEvent> Events { get; set; } = new List<DayEvent>();
         public string[] DayNames { get; set; }
         public DateTime SelectedDay { get; set; } = DateTime.Now;
-
-        private DateTime _controlDate = DateTime.Now;
-        public DateTime ControlDate
-        {
-            get => _controlDate;
-            set
-            {
-                if (_controlDate != value)
-                {
-                    _controlDate = value;
-                    OnPropertyChanged(nameof(ControlDate));
-                    LoadMonth(_controlDate);
-                }
-            }
-        }
-
-        public ICommand NextMonth => new Command(() => ControlDate = ControlDate.AddMonths(1));
-        public ICommand PreviousMonth => new Command(() => ControlDate = ControlDate.AddMonths(-1));
 
         public CalendarViewModel()
         {
             DayNames = DateTimeFormatInfo.CurrentInfo.DayNames.Select(n => n.Substring(0, 3).ToUpper()).ToArray();
-            LoadMonth(ControlDate);
+            var Event = new DayEvent
+            (
+                new DateTime(2025, 5, 12),
+                new DateTime(2025, 5, 16),
+                "EVENT01"
+            );
+            Event.Color = Color.FromRgba("#dd0000");
+            Events.Add( Event );
+            var Event2 = new DayEvent
+            (
+                new DateTime(2025, 4, 22),
+                new DateTime(2025, 5, 3),
+                "EVENT01"
+            );
+            Event2.Color = Color.FromRgba("#a5be00");
+            Events.Add(Event2);
+            var Event3 = new DayEvent
+            (
+                new DateTime(2025, 5, 6),
+                new DateTime(2025, 5, 7),
+                "EVENT01"
+            );
+            Event3.Color = Color.FromRgba("#0036fa");
+            Events.Add(Event3);
+            var Event4 = new DayEvent
+            (
+                new DateTime(2025, 5, 25),
+                new DateTime(2025, 5, 25),
+                "EVENT01"
+            );
+            Event4.Color = Color.FromRgba("#ffb900");
+            Events.Add(Event4);
+            Events.Add(Event4);
+            Events.Add(Event4);
         }
-
-        void LoadMonth(DateTime month)
+        public void LoadMonth(DateTime month)
         {
             Days.Clear();
             var firstOfMonth = new DateTime(month.Year, month.Month, 1);
@@ -56,6 +71,7 @@ namespace Calendar.ViewModel
                 var date = startDate.AddDays(i);
                 Days.Add(new CalendarDay
                 {
+                    Events = Events.Where(e => e.isInRange(date)).ToList(),
                     Date = date,
                     IsCurrentMonth = date.Month == month.Month,
                     IsToday = date.Date == DateTime.Now.Date,
