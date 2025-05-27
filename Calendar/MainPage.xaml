@@ -2,56 +2,49 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:models="clr-namespace:Calendar.Model"
-             x:Class="Calendar.MainPage">
-
-    <StackLayout>
+             x:Name="this"
+             x:Class="Calendar.MainPage"
+             >
+    <ContentPage.Resources>
+        <Style TargetType="Label">
+            <Setter Property="TextColor" Value="#003049" />
+        </Style>
+        <Style TargetType="Button">
+            <Setter Property="BackgroundColor" Value="White" />
+            <Setter Property="TextColor" Value="#003049" />
+            <Setter Property="HeightRequest" Value="32" />
+            <Setter Property="WidthRequest" Value="32" />
+        </Style>
+    </ContentPage.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
         <HorizontalStackLayout HorizontalOptions="Center" Padding="8">
-            <Button Text="&lt;" Command="{Binding PreviousMonth}" HeightRequest="24" />
-            <Label Text="{Binding ControlDate, StringFormat='{0:MMM yyyy}'}"
+            <Button Text="&lt;" BindingContext="{x:Reference this}" Command="{Binding Path=PreviousMonth}"/>
+            <Label BindingContext="{x:Reference this}" Text="{Binding Path=ControlDate, StringFormat='{0:MMMM yyyy}'}"
                    FontAttributes="Bold"
                    FontSize="24"
                    Padding="12" />
-            <Button Text=">" Command="{Binding NextMonth}" HeightRequest="24" />
+            <Button Text=">" BindingContext="{x:Reference this}" Command="{Binding Path=NextMonth}"/>
         </HorizontalStackLayout>
 
-        <CollectionView ItemsSource="{Binding DayNames}" SelectionMode="None" ItemSizingStrategy="MeasureFirstItem" ItemsLayout="VerticalGrid, 7">
-            <CollectionView.ItemTemplate>
-                <DataTemplate x:DataType="x:String">
-                    <Label Text="{Binding .}" FontSize="16" Padding="8"
-                           HorizontalTextAlignment="Center" />
-                </DataTemplate>
-            </CollectionView.ItemTemplate>
-        </CollectionView>
-
-        <CollectionView x:Name="CalendarView"
-                        ItemsSource="{Binding Days}"
-                        SelectionMode="None">
-            <CollectionView.ItemsLayout>
-                <GridItemsLayout Orientation="Vertical" Span="7"
-                                 VerticalItemSpacing="4"
-                                 HorizontalItemSpacing="4" />
-            </CollectionView.ItemsLayout>
-            <CollectionView.ItemTemplate>
-                <DataTemplate x:DataType="models:CalendarDay">
-                    <Border WidthRequest="48"
-                            Padding="8"
-                            Background="{Binding Background}"
-                            Stroke="{Binding Stroke}"
-                            StrokeThickness="{Binding StrokeThickness}">
-                        <Border.GestureRecognizers>
-                            <TapGestureRecognizer CommandParameter="{Binding .}" Tapped="OnDayTapped" />
-                        </Border.GestureRecognizers>
-                        <Label Text="{Binding Date, StringFormat='{0:d }'}"
-                               FontSize="16"
-                               HorizontalTextAlignment="Center"
-                               VerticalTextAlignment="Center" />
-                    </Border>
-                </DataTemplate>
-            </CollectionView.ItemTemplate>
-            <CollectionView.GestureRecognizers>
-                <SwipeGestureRecognizer Direction="Right" Command="{Binding NextMonth}" />
-                <SwipeGestureRecognizer Direction="Left" Command="{Binding PreviousMonth}" />
-            </CollectionView.GestureRecognizers>
-        </CollectionView>
-    </StackLayout>
+        <StackLayout x:Name="CalendarHolder" Background="Transparent" Grid.Row="1">
+            <Grid x:Name="CalendarGrid"
+            Padding="8" />
+            <VerticalStackLayout 
+                x:Name="EventsLayout"
+                Spacing="4"
+                Padding="8"/>
+        </StackLayout>
+        <Button Text="+" 
+                Grid.Row="1" 
+                VerticalOptions="End" 
+                HorizontalOptions="End"
+                Margin="16"/>
+    </Grid>
 </ContentPage>

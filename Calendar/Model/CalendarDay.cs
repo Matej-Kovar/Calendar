@@ -11,6 +11,8 @@ namespace Calendar.Model
     {
         public DateTime Date { get; set; }
 
+        public List<DayEvent> Events { get; set; } = new List<DayEvent>();  
+
         private bool _isSelected;
         public bool IsSelected
         {
@@ -44,12 +46,12 @@ namespace Calendar.Model
 
         public bool IsCurrentMonth { get; set; }
 
-        public Brush Background =>
-            IsToday ? Brush.LightSalmon :
-            !IsCurrentMonth ? Brush.LightGray :
-            Brush.White;
+        public Color Background =>
+            IsToday ? Color.FromRgba("#EAE2B7") :
+            !IsCurrentMonth ? Colors.LightGray :
+            Colors.Transparent;
 
-        public Brush Stroke => IsSelected ? Brush.Coral : Brush.LightGray;
+        public Brush Stroke => IsSelected ? Color.FromRgba("#F3D180") : Brush.Transparent;
         public double StrokeThickness => IsSelected ? 3 : 1;
 
         public event PropertyChangedEventHandler PropertyChanged;
