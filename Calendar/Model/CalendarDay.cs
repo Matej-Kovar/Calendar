@@ -11,20 +11,6 @@ namespace Calendar.Model
     {
         public DateTime Date { get; set; }
 
-        private bool _isCurrentMonth;
-        public bool IsCurrentMonth
-        {
-            get => _isCurrentMonth;
-            set
-            {
-                if (_isCurrentMonth != value)
-                {
-                    _isCurrentMonth = value;
-                    OnPropertyChanged(nameof(IsCurrentMonth));
-                }
-            }
-        }
-
         private bool _isSelected;
         public bool IsSelected
         {
@@ -35,6 +21,8 @@ namespace Calendar.Model
                 {
                     _isSelected = value;
                     OnPropertyChanged(nameof(IsSelected));
+                    OnPropertyChanged(nameof(Stroke));
+                    OnPropertyChanged(nameof(StrokeThickness));
                 }
             }
         }
@@ -49,15 +37,23 @@ namespace Calendar.Model
                 {
                     _isToday = value;
                     OnPropertyChanged(nameof(IsToday));
+                    OnPropertyChanged(nameof(Background));
                 }
             }
         }
 
-        public event PropertyChangedEventHandler? PropertyChanged;
+        public bool IsCurrentMonth { get; set; }
 
-        protected virtual void OnPropertyChanged(string propertyName)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
+        public Brush Background =>
+            IsToday ? Brush.LightSalmon :
+            !IsCurrentMonth ? Brush.LightGray :
+            Brush.White;
+
+        public Brush Stroke => IsSelected ? Brush.Coral : Brush.LightGray;
+        public double StrokeThickness => IsSelected ? 3 : 1;
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        void OnPropertyChanged(string name) =>
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
     }
 }
