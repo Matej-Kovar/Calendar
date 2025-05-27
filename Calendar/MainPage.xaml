@@ -1,0 +1,79 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:models="clr-namespace:Calendar.Model"
+             x:Name="this"
+             x:Class="Calendar.MainPage">
+    <StackLayout>
+        <HorizontalStackLayout HorizontalOptions="Center" Padding="8">
+            <Button Text="&lt;" HeightRequest="24">
+                <Button.GestureRecognizers>
+                    <TapGestureRecognizer BindingContext="{x:Reference this}" Command="{Binding Path=PreviousMonth}"/>
+                </Button.GestureRecognizers>
+            </Button>
+            <Label 
+                    BindingContext="{x:Reference this}"
+                    Text="{Binding Path=ControlDate, StringFormat='{0:MMM yyyy}'}" 
+                    FontAttributes="Bold"
+                    FontSize="24"
+                    Padding="12"
+                />
+            <Button Text=">" HeightRequest="24">
+                <Button.GestureRecognizers>
+                    <TapGestureRecognizer BindingContext="{x:Reference this}" Command="{Binding Path=NextMonth}"/>
+                </Button.GestureRecognizers>
+            </Button>
+        </HorizontalStackLayout>
+
+        <CollectionView BindingContext="{x:Reference this}" ItemsSource="{Binding Path=DayNames}">
+            <CollectionView.ItemsLayout>
+                <GridItemsLayout  Orientation="Vertical" HorizontalItemSpacing="4" Span="7"/>
+            </CollectionView.ItemsLayout>
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="x:String">
+                    <Label 
+                        Text="{Binding .}" FontSize="16" Padding="8"
+                        HorizontalTextAlignment="Center"
+                        VerticalTextAlignment="Center"
+                        />
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <CollectionView BindingContext="{x:Reference this}" ItemsSource="{Binding Path=Days}">
+            <CollectionView.ItemsLayout>
+                <GridItemsLayout Orientation="Vertical" Span="7" VerticalItemSpacing="4" HorizontalItemSpacing="4" />
+            </CollectionView.ItemsLayout>
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="models:CalendarDay">
+                    <Border WidthRequest="48" Padding="8">
+                        <Label
+                        Text="{Binding Date, StringFormat='{0:d }'}"
+                        FontSize="16"
+                        HorizontalTextAlignment="Center"
+                        VerticalTextAlignment="Center"
+                        />
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer BindingContext="{x:Reference this}" Command="{Binding Path=SetSelectedDay}" CommandParameter="{Binding .}"/>
+                        </Border.GestureRecognizers>
+                        <Border.Triggers>
+                            <DataTrigger TargetType="Border" Binding="{Binding IsSelected}" Value="False">
+                                <Setter Property="Background" Value="White"/>
+                            </DataTrigger>
+                            <DataTrigger TargetType="Border" Binding="{Binding IsCurrentMonth}" Value="False">
+                                <Setter Property="Background" Value="LightGray"/>
+                            </DataTrigger>
+                            <DataTrigger TargetType="Border" Binding="{Binding IsSelected}" Value="True">
+                                <Setter Property="Stroke" Value="Coral"/>
+                                <Setter Property="StrokeThickness" Value="3"/>
+                            </DataTrigger>
+                            <DataTrigger TargetType="Border" Binding="{Binding IsToday}" Value="True">
+                                <Setter Property="Background" Value="LightSalmon"/>
+                            </DataTrigger>
+                        </Border.Triggers>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </StackLayout>
+</ContentPage>
