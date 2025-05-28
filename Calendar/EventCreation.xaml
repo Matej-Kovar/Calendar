@@ -38,14 +38,16 @@
             <VerticalStackLayout FlexLayout.Grow="1">
                 <Label Text="Od"/>
                 <HorizontalStackLayout Spacing="4">
-                    <Label Text="{Binding Source={x:Reference this}, Path=StartDate.Date, StringFormat='{0:dd.MM.yyyy}'}"/>
+                    <Button Text="{Binding Source={x:Reference this}, Path=StartDate.Date, StringFormat='{0:dd.MM.yyyy}'}"
+                            Clicked="OnInputSelected" CommandParameter="StartDate"/>
                     <Label Text="{Binding Source={x:Reference this}, Path=StartDate.TimeOfDay, StringFormat='{0:hh\\:mm}'}"/>
                 </HorizontalStackLayout>
             </VerticalStackLayout>
             <VerticalStackLayout FlexLayout.Grow="1">
                 <Label Text="Do"/>
                 <HorizontalStackLayout Spacing="4">
-                    <Label Text="{Binding Source={x:Reference this}, Path=EndDate.Date, StringFormat='{0:dd.MM.yyyy}'}"/>
+                    <Button Text="{Binding Source={x:Reference this}, Path=EndDate.Date, StringFormat='{0:dd.MM.yyyy}'}"
+                            Clicked="OnInputSelected" CommandParameter="EndDate"/>
                     <Label Text="{Binding Source={x:Reference this}, Path=EndDate.TimeOfDay, StringFormat='{0:hh\\:mm}'}"/>
                 </HorizontalStackLayout>
             </VerticalStackLayout>

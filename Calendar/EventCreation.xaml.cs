@@ -21,6 +21,20 @@ public partial class EventCreation : ContentPage, INotifyPropertyChanged
             }
         }
     }
+
+    private DateTime _endDate = DateTime.Now;
+    public DateTime EndDate
+    {
+        get => _endDate;
+        set
+        {
+            if (_endDate != value)
+            {
+                _endDate = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(EndDate)));
+            }
+        }
+    }
     public enum InputSelected
     {
         None,
@@ -30,7 +44,6 @@ public partial class EventCreation : ContentPage, INotifyPropertyChanged
         EndTime
     }
     public InputSelected selectedInput { get; set; } = InputSelected.None;
-    public DateTime EndDate { get; set; } = DateTime.Now;
     public int Repeat {  get; set; }
     public Color Color { get; set; } = Colors.Black;
 	public EventCreation()
@@ -52,17 +65,29 @@ public partial class EventCreation : ContentPage, INotifyPropertyChanged
         });
     }
 
+    private void OnInputSelected(object sender, EventArgs e)
+    {
+        if (sender is Button btn && Enum.TryParse<InputSelected>(btn.CommandParameter?.ToString(), out var input))
+        {
+            selectedInput = selectedInput == input ? InputSelected.None : input;
+            RenderInput();
+        }
+    }
     public void RenderInput()
     {
         InputSection.Children.Clear();
-        if (/*selectedInput == InputSelected.StartDate || selectedInput == InputSelected.EndDate*/true)
+        if (selectedInput == InputSelected.StartDate || selectedInput == InputSelected.EndDate)
         {
             var calendar = new CalendarView
             {
                 FontSize = 14,
                 GenerateEvents = false,
             };
-            calendar.SetBinding(CalendarView.SelectedDayProperty, new Binding(nameof(StartDate), source: this, mode: BindingMode.TwoWay));
+
+            calendar.SetBinding(
+                CalendarView.SelectedDayProperty,
+                new Binding(selectedInput == InputSelected.StartDate ? nameof(StartDate) : nameof(EndDate), source: this, mode: BindingMode.TwoWay)
+            );
             InputSection.Children.Add(calendar);
             
         }
