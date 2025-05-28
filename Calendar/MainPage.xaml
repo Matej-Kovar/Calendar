@@ -34,17 +34,12 @@
         </HorizontalStackLayout>
 
         <StackLayout x:Name="CalendarHolder" Background="Transparent" Grid.Row="1">
-            <Grid x:Name="CalendarGrid"
-            Padding="8" />
-            <VerticalStackLayout 
-                x:Name="EventsLayout"
-                Spacing="4"
-                Padding="8"/>
         </StackLayout>
         <Button Text="+" 
                 Grid.Row="1" 
                 VerticalOptions="End" 
                 HorizontalOptions="End"
-                Margin="16"/>
+                Margin="16"
+                Clicked="OnAddButtonClicked"/>
     </Grid>
 </ContentPage>

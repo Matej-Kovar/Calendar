@@ -13,14 +13,12 @@ namespace Calendar.ViewModel
 {
     public class CalendarViewModel : INotifyPropertyChanged
     {
-        public List<CalendarDay> Days { get; set; } = new List<CalendarDay>();
+        public ObservableCollection<CalendarDay> Days { get; set; } = new ObservableCollection<CalendarDay>();
         public List<DayEvent> Events { get; set; } = new List<DayEvent>();
-        public string[] DayNames { get; set; }
         public DateTime SelectedDay { get; set; } = DateTime.Now;
 
         public CalendarViewModel()
         {
-            DayNames = DateTimeFormatInfo.CurrentInfo.DayNames.Select(n => n.Substring(0, 3).ToUpper()).ToArray();
             var Event = new DayEvent
             (
                 new DateTime(2025, 5, 12),
