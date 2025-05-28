@@ -8,6 +8,12 @@ namespace Calendar.Model
 {
     public class EventTag
     {
+        public EventTag(Color color, string name)
+        {
+            Color = color;
+            Name = name;
+        }
+
         public Color Color { get; set; }
         public string Name { get; set; }
     }

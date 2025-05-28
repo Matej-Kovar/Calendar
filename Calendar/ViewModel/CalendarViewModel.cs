@@ -52,7 +52,38 @@ namespace Calendar.ViewModel
                 "EVENT01"
             );
             Event4.Color = Color.FromRgba("#ffb900");
-            Events.Add(Event4);
+            var Event5 = new DayEvent
+            (
+                new DateTime(2025, 5, 4),
+                new DateTime(2025, 5, 9),
+                "EVENT01"
+            );
+            Event5.Color = Color.FromRgba("#dd0000");
+            Events.Add(Event5);
+            var Event6 = new DayEvent
+            (
+                new DateTime(2025, 5, 7),
+                new DateTime(2025, 5, 15),
+                "EVENT01"
+            );
+            Event6.Color = Color.FromRgba("#a5be00");
+            Events.Add(Event6);
+            var Event7 = new DayEvent
+            (
+                new DateTime(2025, 5, 4),
+                new DateTime(2025, 5, 8),
+                "EVENT01"
+            );
+            Event7.Color = Color.FromRgba("#0036fa");
+            Events.Add(Event7);
+            var Event8 = new DayEvent
+            (
+                new DateTime(2025, 5, 24),
+                new DateTime(2025, 5, 29),
+                "EVENT01"
+            );
+            Event8.Color = Color.FromRgba("#ffb900");
+            Events.Add(Event8);
             Events.Add(Event4);
             Events.Add(Event4);
         }
@@ -88,7 +119,7 @@ namespace Calendar.ViewModel
             tappedDay.IsSelected = true;
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
         void OnPropertyChanged(string name) =>
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
     }
