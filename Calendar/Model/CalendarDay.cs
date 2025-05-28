@@ -54,7 +54,7 @@ namespace Calendar.Model
         public Brush Stroke => IsSelected ? Color.FromRgba("#F3D180") : Brush.Transparent;
         public double StrokeThickness => IsSelected ? 3 : 1;
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
         void OnPropertyChanged(string name) =>
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
     }

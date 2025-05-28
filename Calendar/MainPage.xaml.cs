@@ -26,6 +26,7 @@ namespace Calendar
         }
         public MainPage()
         {
+            //swipe nefunguje
             double panX = 0;
             var panGesture = new PanGestureRecognizer();
             panGesture.PanUpdated += (s, e) =>
