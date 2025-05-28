@@ -16,24 +16,14 @@
             <Setter Property="WidthRequest" Value="32" />
         </Style>
     </ContentPage.Resources>
-    <Grid>
+    <Grid Padding="16">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
-        <HorizontalStackLayout HorizontalOptions="Center" Padding="8">
-            <Button Text="&lt;" BindingContext="{x:Reference this}" Command="{Binding Path=PreviousMonth}"/>
-            <Label BindingContext="{x:Reference this}" Text="{Binding Path=ControlDate, StringFormat='{0:MMMM yyyy}'}"
-                   FontAttributes="Bold"
-                   FontSize="24"
-                   Padding="12" />
-            <Button Text=">" BindingContext="{x:Reference this}" Command="{Binding Path=NextMonth}"/>
-        </HorizontalStackLayout>
-
-        <StackLayout x:Name="CalendarHolder" Background="Transparent" Grid.Row="1">
+        <StackLayout x:Name="CalendarHolder" Background="Transparent" Grid.Row="0">
         </StackLayout>
         <Button Text="+" 
                 Grid.Row="1" 

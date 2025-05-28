@@ -26,7 +26,7 @@ namespace Calendar.Model
 
         public bool isInRange(DateTime date)
         {
-            return date.Date >= StarDate.Date && date <= EndDate.Date;
+            return date.Date >= StarDate.Date && date.Date <= EndDate.Date;
         }
     }
 }

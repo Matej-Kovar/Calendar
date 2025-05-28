@@ -1,9 +1,11 @@
 using Calendar.Model;
+using Calendar.ViewModel;
 using Microsoft.Maui.Controls;
 using Microsoft.Maui.Controls.Shapes;
 using Microsoft.Maui.Layouts;
 using System.Collections.ObjectModel;
 using System.Globalization;
+using System.Windows.Input;
 
 namespace Calendar
 {
@@ -11,36 +13,98 @@ namespace Calendar
     {
         private readonly Grid _calendarGrid = new();
 
+        VerticalStackLayout _verticalStackLayout = new();
+
+        private DateTime _controlDate = DateTime.Now;
+        public DateTime ControlDate
+        {
+            get => _controlDate;
+            set
+            {
+                if (_controlDate != value)
+                {
+                    _controlDate = value;
+                    OnPropertyChanged(nameof(ControlDate));
+                    RenderCalendar();
+                }
+            }
+        }
+
         public CalendarView()
         {
             DayNames = DateTimeFormatInfo.CurrentInfo.DayNames.Select(n => n.Substring(0, 3).ToUpper()).ToArray();
-            Content = _calendarGrid;
+            _verticalStackLayout.Children.Clear();
+            _verticalStackLayout.Children.Add(generateControls());
+            _verticalStackLayout.Children.Add(_calendarGrid);
+            Content = _verticalStackLayout;
             RenderCalendar();
         }
 
-        // Bindable properties
-        public static readonly BindableProperty DaysProperty =
-            BindableProperty.Create(nameof(Days), typeof(ObservableCollection<CalendarDay>), typeof(CalendarView), new ObservableCollection<CalendarDay>(), propertyChanged: (b, o, n) => ((CalendarView)b).RenderCalendar());
-
-        public static readonly BindableProperty OnDayTappedProperty =
-            BindableProperty.Create(nameof(OnDayTapped), typeof(Action<CalendarDay>), typeof(CalendarView), null);
+        public static readonly BindableProperty EventsProperty =
+            BindableProperty.Create(nameof(Events), typeof(List<DayEvent>), typeof(CalendarView), new List<DayEvent>(), propertyChanged: (b, o, n) => ((CalendarView)b).RenderCalendar());
 
         public static readonly BindableProperty GenerateEventsProperty =
             BindableProperty.Create(nameof(GenerateEvents), typeof(bool), typeof(CalendarView), true, propertyChanged: (b, o, n) => ((CalendarView)b).RenderCalendar());
 
         public static readonly BindableProperty FontSizeProperty =
             BindableProperty.Create(nameof(FontSize), typeof(double), typeof(CalendarView), 16.0, propertyChanged: (b, o, n) => ((CalendarView)b).RenderCalendar());
+        public ObservableCollection<CalendarDay> Days { get; set; } = new ObservableCollection<CalendarDay>();
 
-        public ObservableCollection<CalendarDay> Days
+        public static readonly BindableProperty SelectedDayProperty =
+            BindableProperty.Create(
+                nameof(SelectedDay),
+                typeof(DateTime),
+                typeof(CalendarView),
+                DateTime.Now,
+                BindingMode.TwoWay,
+                propertyChanged: OnSelectedDayChanged
+            );
+        private static void OnSelectedDayChanged(BindableObject bindable, object oldValue, object newValue)
         {
-            get => (ObservableCollection<CalendarDay>)GetValue(DaysProperty);
-            set => SetValue(DaysProperty, value);
+            var calendar = (CalendarView)bindable;
         }
 
-        public Action<CalendarDay>? OnDayTapped
+        public DateTime SelectedDay
         {
-            get => (Action<CalendarDay>?)GetValue(OnDayTappedProperty);
-            set => SetValue(OnDayTappedProperty, value);
+            get => (DateTime)GetValue(SelectedDayProperty);
+            set => SetValue(SelectedDayProperty, value);
+        }
+
+        public void LoadMonth(DateTime month, List<DayEvent> events)
+        {
+            Days.Clear();
+            var firstOfMonth = new DateTime(month.Year, month.Month, 1);
+            var lastOfMonth = new DateTime(month.Year, month.Month, DateTime.DaysInMonth(month.Year, month.Month));
+            int offsetBefore = (int)firstOfMonth.DayOfWeek;
+            int offsetAfter = 7 - (int)lastOfMonth.DayOfWeek;
+            var startDate = firstOfMonth.AddDays(-offsetBefore);
+            int total = DateTime.DaysInMonth(month.Year, month.Month) + offsetAfter + offsetBefore - 1;
+
+            for (int i = 0; i < total; i++)
+            {
+                var date = startDate.AddDays(i);
+                Days.Add(new CalendarDay
+                {
+                    Events = events.Where(e => e.isInRange(date)).ToList(),
+                    Date = date,
+                    IsCurrentMonth = date.Month == month.Month,
+                    IsToday = date.Date == DateTime.Now.Date,
+                    IsSelected = date.Date == SelectedDay.Date
+                });
+            }
+        }
+
+        public void SetSelectedDay(CalendarDay tappedDay)
+        {
+            SelectedDay = tappedDay.Date;
+            foreach (var day in Days)
+                day.IsSelected = false;
+            tappedDay.IsSelected = true;
+        }
+        public List<DayEvent> Events
+        {
+            get => (List<DayEvent>)GetValue(EventsProperty);
+            set => SetValue(EventsProperty, value);
         }
 
         public bool GenerateEvents
@@ -59,6 +123,8 @@ namespace Calendar
 
         public void RenderCalendar()
         {
+            LoadMonth(ControlDate, Events);
+
             _calendarGrid.Children.Clear();
             _calendarGrid.RowDefinitions.Clear();
             _calendarGrid.ColumnDefinitions.Clear();
@@ -138,7 +204,7 @@ namespace Calendar
 
             stack.Children.Add(border);
 
-            if (GenerateEvents && day.Events.Any())
+            if (GenerateEvents)
             {
                 var bubbleLayout = new FlexLayout
                 {
@@ -164,6 +230,56 @@ namespace Calendar
             }
 
             return stack;
+        }
+
+        void OnDayTapped(CalendarDay tappedDay)
+        {
+            SetSelectedDay(tappedDay);
+        }
+        public ICommand NextMonth => new Command(() => ControlDate = ControlDate.AddMonths(1));
+        public ICommand PreviousMonth => new Command(() => ControlDate = ControlDate.AddMonths(-1));
+
+        HorizontalStackLayout generateControls()
+        {
+            var layout = new HorizontalStackLayout
+            {
+                HorizontalOptions = LayoutOptions.Center,
+                Padding = FontSize / 2,
+            };
+
+            var previousButton = new Button
+            {
+                Text = "<",
+                BindingContext = this,
+                HeightRequest = FontSize * 2,
+                WidthRequest = FontSize * 2
+            };
+            previousButton.SetBinding(Button.CommandProperty, "PreviousMonth");
+
+            var monthLabel = new Label
+            {
+                FontAttributes = FontAttributes.Bold,
+                FontSize = FontSize,
+                Padding = FontSize * 0.75,
+                BindingContext = this
+            };
+            monthLabel.SetBinding(Label.TextProperty, new Binding("ControlDate", stringFormat: "{0:MMMM yyyy}"));
+
+            var nextButton = new Button
+            {
+                Text = ">",
+                BindingContext = this,
+                HeightRequest = FontSize * 2,
+                WidthRequest = FontSize * 2
+
+            };
+            nextButton.SetBinding(Button.CommandProperty, "NextMonth");
+
+            layout.Children.Add(previousButton);
+            layout.Children.Add(monthLabel);
+            layout.Children.Add(nextButton);
+
+            return layout;
         }
     }
 }

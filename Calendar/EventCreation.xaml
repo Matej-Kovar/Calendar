@@ -2,37 +2,57 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Calendar.EventCreation"
+             x:Name="this"
              Title="EventCreation"
              Padding="16">
+    <ContentPage.Resources>
+        <Style TargetType="Label">
+            <Setter Property="TextColor" Value="#003049" />
+        </Style>
+        <Style TargetType="Button">
+            <Setter Property="BackgroundColor" Value="White" />
+            <Setter Property="TextColor" Value="#003049" />
+        </Style>
+    </ContentPage.Resources>
     <VerticalStackLayout Spacing="8">
         <FlexLayout >
-            <Entry Placeholder="Název" FlexLayout.Grow="1" Margin="0,0,8,0"/>
-            <Button />
+            <Entry Placeholder="Název" 
+                   FlexLayout.Grow="1" 
+                   Margin="0,0,8,0"
+                   x:Name="EventName"/>
+            <Button Text="+"
+                    Clicked="OnSubmitButtonClicked"
+                    HeightRequest="42"
+                    WidthRequest="42"/>
         </FlexLayout>
-        <Entry Placeholder="Popis" />
-        <HorizontalStackLayout Spacing="8" Padding="0,4,0,4">
-            <Label Text="Repeat every"/>
-            <Label Text="4 days" />
-        </HorizontalStackLayout>
+        <Entry Placeholder="Popis" 
+               x:Name="EventDescription"/>
+        <FlexLayout>
+            <HorizontalStackLayout Spacing="4" Padding="0,4,0,4" FlexLayout.Grow="1">
+                <Label Text="Opakovat každé"/>
+                <Label Text="4 dny"/>
+            </HorizontalStackLayout>
+            <Button Text="Barva"/>
+        </FlexLayout>
         <FlexLayout>
             <VerticalStackLayout FlexLayout.Grow="1">
-                <Label Text="From"/>
-                <HorizontalStackLayout>
-                    <Label Text="28. 05. 2025"/>
-                    <Label Text="9:32"/>
+                <Label Text="Od"/>
+                <HorizontalStackLayout Spacing="4">
+                    <Label Text="{Binding Source={x:Reference this}, Path=StartDate.Date, StringFormat='{0:dd.MM.yyyy}'}"/>
+                    <Label Text="{Binding Source={x:Reference this}, Path=StartDate.TimeOfDay, StringFormat='{0:hh\\:mm}'}"/>
                 </HorizontalStackLayout>
             </VerticalStackLayout>
             <VerticalStackLayout FlexLayout.Grow="1">
-                <Label Text="To"/>
-                <HorizontalStackLayout>
-                    <Label Text="28. 05. 2025"/>
-                    <Label Text="9:35"/>
+                <Label Text="Do"/>
+                <HorizontalStackLayout Spacing="4">
+                    <Label Text="{Binding Source={x:Reference this}, Path=EndDate.Date, StringFormat='{0:dd.MM.yyyy}'}"/>
+                    <Label Text="{Binding Source={x:Reference this}, Path=EndDate.TimeOfDay, StringFormat='{0:hh\\:mm}'}"/>
                 </HorizontalStackLayout>
             </VerticalStackLayout>
         </FlexLayout>
-        <StackLayout>
+        <StackLayout x:Name="InputSection">
             
         </StackLayout>
-        <Entry />
+        <Entry Placeholder="Místo" x:Name="EventPlace"/>
     </VerticalStackLayout>
 </ContentPage>
