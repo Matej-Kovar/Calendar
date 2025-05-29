@@ -17,6 +17,8 @@ public partial class TimeSelectionView : ContentView
         set => SetValue(SelectedTimeProperty, value);
     }
 
+    bool updating = false;
+
     DateTime TempSelectedTime;
 
     public TimeSelectionView(DateTime defaultTime)
@@ -30,16 +32,34 @@ public partial class TimeSelectionView : ContentView
 	}
     private void HoursEntry_TextChanged(object sender, TextChangedEventArgs e)
     {
-        int temp = 0;
-        HoursEntry.Text = timeParser(e.NewTextValue, 23, ref temp);
-        TempSelectedTime = new DateTime(TempSelectedTime.Year, TempSelectedTime.Month, TempSelectedTime.Day, temp, TempSelectedTime.Minute, 0);
+        if (!updating)
+        {
+            updating = true;
+            int temp = 0;
+            Dispatcher.Dispatch(() =>
+            {
+                HoursEntry.Text = timeParser(e.NewTextValue, 23, ref temp);
+                TempSelectedTime = new DateTime(TempSelectedTime.Year, TempSelectedTime.Month, TempSelectedTime.Day, temp, TempSelectedTime.Minute, 0);
+                updating = false;
+            });
+
+        }
     }
 
     private void MinutesEntry_TextChanged(object sender, TextChangedEventArgs e)
     {
-        int temp = 0;
-        MinutesEntry.Text = timeParser(e.NewTextValue, 59, ref temp);
-        TempSelectedTime = new DateTime(TempSelectedTime.Year, TempSelectedTime.Month, TempSelectedTime.Day, TempSelectedTime.Hour, temp, 0);
+        if (!updating)
+        {
+            updating = true;
+            int temp = 0;
+            Dispatcher.Dispatch(() =>
+            {
+                MinutesEntry.Text = timeParser(e.NewTextValue, 59, ref temp);
+                TempSelectedTime = new DateTime(TempSelectedTime.Year, TempSelectedTime.Month, TempSelectedTime.Day, TempSelectedTime.Hour, temp, 0);
+                updating = false;
+            }); 
+
+        }
     }
 
     private void OnSubmitButtonClicked(object sender, EventArgs e)
@@ -49,39 +69,15 @@ public partial class TimeSelectionView : ContentView
 
     private string timeParser(string input, int max, ref int intVar)
     {
-        string output = "00";
-        if (int.TryParse(input, out int minute))
-        {
-            if (minute <= 0)
-            {
-                output = "00";
-                intVar = 0;
-            }
-            else if (minute > max)
-            {
-                if ((minute % 100) > max)
-                {
-                    intVar = minute % 10;
-                    output = intVar.ToString();
-                }
-                else
-                {
-                    intVar = minute % 100;
-                    output = intVar.ToString();
-                }
-            }
-            else if(minute < 10)
-            {
-                output = "0" + minute.ToString();
-                intVar = minute;
-            }
-            else
-            {
-                output = minute.ToString();
-                intVar = minute;
-            }
+        intVar = 0;
 
+        if (int.TryParse(input, out int value))
+        {
+            value = Math.Clamp(value % 100, 0, max);
+            intVar = value;
+            return value.ToString("D2");
         }
-        return output;
+
+        return "00";
     }
 }
