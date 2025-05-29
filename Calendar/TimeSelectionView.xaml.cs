@@ -71,11 +71,27 @@ public partial class TimeSelectionView : ContentView
     {
         intVar = 0;
 
-        if (int.TryParse(input, out int value))
+        if (!int.TryParse(input, out int value))
+            return "00";
+
+        if (value <= 0)
         {
-            value = Math.Clamp(value % 100, 0, max);
-            intVar = value;
-            return value.ToString("D2");
+            intVar = 0;
+            return "00";
+        }
+
+        int candidate = value % 100;
+        if (candidate <= max)
+        {
+            intVar = candidate;
+            return candidate.ToString("D2");
+        }
+
+        candidate = value % 10;
+        if (candidate <= max)
+        {
+            intVar = candidate;
+            return candidate.ToString("D2");
         }
 
         return "00";
