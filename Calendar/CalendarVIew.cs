@@ -4,7 +4,9 @@ using Microsoft.Maui.Controls;
 using Microsoft.Maui.Controls.Shapes;
 using Microsoft.Maui.Layouts;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Globalization;
+using System.Runtime.CompilerServices;
 using System.Windows.Input;
 
 namespace Calendar
@@ -37,18 +39,24 @@ namespace Calendar
             _verticalStackLayout.Children.Add(generateControls());
             _verticalStackLayout.Children.Add(_calendarGrid);
             Content = _verticalStackLayout;
-            RenderCalendar();
+            Dispatcher.Dispatch(() => RenderCalendar());
         }
 
-        public static readonly BindableProperty EventsProperty =
-            BindableProperty.Create(nameof(Events), typeof(List<DayEvent>), typeof(CalendarView), new List<DayEvent>(), propertyChanged: (b, o, n) => ((CalendarView)b).RenderCalendar());
-
         public static readonly BindableProperty GenerateEventsProperty =
-            BindableProperty.Create(nameof(GenerateEvents), typeof(bool), typeof(CalendarView), true, propertyChanged: (b, o, n) => ((CalendarView)b).RenderCalendar());
+            BindableProperty.Create(nameof(GenerateEvents), typeof(bool), typeof(CalendarView), true);
 
         public static readonly BindableProperty FontSizeProperty =
-            BindableProperty.Create(nameof(FontSize), typeof(double), typeof(CalendarView), 16.0, propertyChanged: (b, o, n) => ((CalendarView)b).RenderCalendar());
-        public ObservableCollection<CalendarDay> Days { get; set; } = new ObservableCollection<CalendarDay>();
+            BindableProperty.Create(nameof(FontSize), typeof(double), typeof(CalendarView), 16.0);
+        public List<CalendarDay> Days { get; set; } = new List<CalendarDay>();
+
+        public static readonly BindableProperty EventsProperty =
+            BindableProperty.Create(
+            nameof(Events),
+            typeof(ObservableCollection<DayEvent>),
+            typeof(CalendarView),
+            new ObservableCollection<DayEvent>(),
+            BindingMode.TwoWay
+        );
 
         public static readonly BindableProperty SelectedDayProperty =
             BindableProperty.Create(
@@ -62,6 +70,8 @@ namespace Calendar
         private static void OnSelectedDayChanged(BindableObject bindable, object oldValue, object newValue)
         {
             var calendar = (CalendarView)bindable;
+            
+            calendar.Dispatcher.Dispatch(() => calendar.RenderCalendar());
         }
 
         public DateTime SelectedDay
@@ -70,7 +80,7 @@ namespace Calendar
             set => SetValue(SelectedDayProperty, value);
         }
 
-        public void LoadMonth(DateTime month, List<DayEvent> events)
+        public void LoadMonth(DateTime month, ObservableCollection<DayEvent> events)
         {
             Days.Clear();
             var firstOfMonth = new DateTime(month.Year, month.Month, 1);
@@ -101,9 +111,9 @@ namespace Calendar
                 day.IsSelected = false;
             tappedDay.IsSelected = true;
         }
-        public List<DayEvent> Events
+        public ObservableCollection<DayEvent> Events
         {
-            get => (List<DayEvent>)GetValue(EventsProperty);
+            get => (ObservableCollection<DayEvent>)GetValue(EventsProperty);
             set => SetValue(EventsProperty, value);
         }
 
@@ -203,7 +213,6 @@ namespace Calendar
             }
 
             stack.Children.Add(border);
-
             if (GenerateEvents)
             {
                 var bubbleLayout = new FlexLayout
@@ -222,7 +231,7 @@ namespace Calendar
                         Fill = e.Color,
                         Stroke = Colors.Transparent,
                         WidthRequest = FontSize / 2,
-                        HeightRequest = FontSize / 2
+                        HeightRequest = FontSize / 2,
                     });
                 }
 

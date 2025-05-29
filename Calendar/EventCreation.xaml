@@ -32,7 +32,7 @@
                 <Label Text="Opakovat každé"/>
                 <Label Text="4 dny"/>
             </HorizontalStackLayout>
-            <Button Text="Barva"/>
+            <Button Text="Barva" Clicked="OnInputSelected" CommandParameter="Color"/>
         </FlexLayout>
         <FlexLayout>
             <VerticalStackLayout FlexLayout.Grow="1">
@@ -40,7 +40,8 @@
                 <HorizontalStackLayout Spacing="4">
                     <Button Text="{Binding Source={x:Reference this}, Path=StartDate.Date, StringFormat='{0:dd.MM.yyyy}'}"
                             Clicked="OnInputSelected" CommandParameter="StartDate"/>
-                    <Label Text="{Binding Source={x:Reference this}, Path=StartDate.TimeOfDay, StringFormat='{0:hh\\:mm}'}"/>
+                    <Button Text="{Binding Source={x:Reference this}, Path=StartTime.TimeOfDay, StringFormat='{0:hh\\:mm}'}"
+                            Clicked="OnInputSelected" CommandParameter="StartTime"/>
                 </HorizontalStackLayout>
             </VerticalStackLayout>
             <VerticalStackLayout FlexLayout.Grow="1">
@@ -48,7 +49,8 @@
                 <HorizontalStackLayout Spacing="4">
                     <Button Text="{Binding Source={x:Reference this}, Path=EndDate.Date, StringFormat='{0:dd.MM.yyyy}'}"
                             Clicked="OnInputSelected" CommandParameter="EndDate"/>
-                    <Label Text="{Binding Source={x:Reference this}, Path=EndDate.TimeOfDay, StringFormat='{0:hh\\:mm}'}"/>
+                    <Button Text="{Binding Source={x:Reference this}, Path=EndTime.TimeOfDay, StringFormat='{0:hh\\:mm}'}"
+                            Clicked="OnInputSelected" CommandParameter="EndTime"/>
                 </HorizontalStackLayout>
             </VerticalStackLayout>
         </FlexLayout>

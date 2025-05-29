@@ -2,6 +2,7 @@
 using Calendar.ViewModel;
 using Microsoft.Maui.Controls.Handlers.Items;
 using Microsoft.Maui.Controls.Shapes;
+using System.Collections.ObjectModel;
 using System.Windows.Input;
 
 namespace Calendar
@@ -10,7 +11,7 @@ namespace Calendar
     {
         CalendarView Calendar;
 
-        public List<DayEvent> Events = new List<DayEvent>();
+        public ObservableCollection<DayEvent> Events = new ObservableCollection<DayEvent>();
 
         public MainPage()
         {

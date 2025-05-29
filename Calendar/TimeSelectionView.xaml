@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Calendar.TimeSelectionView">
+    <Grid Padding="16" 
+          ColumnSpacing="8" 
+          RowSpacing="4" 
+          HorizontalOptions="Center"
+          VerticalOptions="Center">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+        <Label Text="Vyberte čas" Grid.ColumnSpan="3"/>
+        <Button Grid.ColumnSpan="3" Grid.Row="3" Text="Potvrdit" HorizontalOptions="Fill" Clicked="OnSubmitButtonClicked"/>
+        <Entry Grid.Row="1" 
+               FontSize="24" 
+               WidthRequest="48"
+               x:Name="HoursEntry"
+               TextChanged="HoursEntry_TextChanged"/>
+        <Label Text=":" Grid.Row="1" Grid.Column="1" FontSize="32" VerticalOptions="Center"/>
+        <Entry Grid.Row="1" 
+               Grid.Column="2" 
+               FontSize="24" 
+               WidthRequest="48"
+               x:Name="MinutesEntry"
+               TextChanged="MinutesEntry_TextChanged"/>
+        <Label Text="Hodiny" Grid.Row="2" Grid.Column="0" HorizontalOptions="Center"/>
+        <Label Text="Minuty" Grid.Row="2" Grid.Column="3" HorizontalOptions="Center"/>
+    </Grid>
+</ContentView>
