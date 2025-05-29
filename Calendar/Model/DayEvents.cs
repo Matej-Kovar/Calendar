@@ -18,7 +18,7 @@ namespace Calendar.Model
         public DateTime StarDate { get; set; }
         public DateTime EndDate { get; set; }
         public string Name { get; set; }
-        public List<EventTag> Tags { get; set; } = new List<EventTag>();
+        //public List<EventTag> Tags { get; set; } = new List<EventTag>();
         public string? Description { get; set; }
         public string? Place { get; set; }
         public int? RepeatAfter {  get; set; }

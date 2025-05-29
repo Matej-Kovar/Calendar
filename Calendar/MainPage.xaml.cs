@@ -11,6 +11,13 @@ namespace Calendar
     {
         CalendarView Calendar;
 
+        DateTime _selectdDay = DateTime.Now;
+        public DateTime SelectedDay
+        {
+            get {  return _selectdDay; }
+            set { _selectdDay = value; UpdateEventList(); }
+        }
+
         public ObservableCollection<DayEvent> Events = new ObservableCollection<DayEvent>();
 
         public MainPage()
@@ -22,7 +29,13 @@ namespace Calendar
                 FontSize = 16,
                 GenerateEvents = true,
             };
+            Calendar.SetBinding(
+                CalendarView.SelectedDayProperty,
+                new Binding(nameof(SelectedDay), source: this, mode: BindingMode.TwoWay)
+            );
             CalendarHolder.Children.Add(Calendar);
+            Calendar.RenderCalendar();
+            UpdateEventList();
         }
 
         private async void OnAddButtonClicked(object sender, EventArgs e)
@@ -45,6 +58,19 @@ namespace Calendar
         {
             Calendar.Events = Events;
             Calendar.RenderCalendar();
+        }
+
+        public void UpdateEventList()
+        {
+            EventDetails.Children.Clear();
+            if (Calendar is not null)
+            {
+                foreach (DayEvent dayEvent in Calendar.Days.Where(d => d.Date == SelectedDay.Date).FirstOrDefault().Events)
+                {
+                    var detail = new EventDetailView(dayEvent);
+                    EventDetails.Children.Add(detail);
+                }
+            }
         }
     }
 }

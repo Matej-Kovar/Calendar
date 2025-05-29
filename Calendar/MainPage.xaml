@@ -16,20 +16,28 @@
             <Setter Property="WidthRequest" Value="32" />
         </Style>
     </ContentPage.Resources>
-    <Grid Padding="16">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" />
-        </Grid.ColumnDefinitions>
-        <StackLayout x:Name="CalendarHolder" Background="Transparent" Grid.Row="0">
-        </StackLayout>
-        <Button Text="+" 
-                Grid.Row="1" 
-                VerticalOptions="End" 
-                HorizontalOptions="End"
-                Margin="16"
-                Clicked="OnAddButtonClicked"/>
-    </Grid>
+    <ScrollView>
+        <VerticalStackLayout Padding="16">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <StackLayout x:Name="CalendarHolder" Background="Transparent" Grid.Row="0">
+                </StackLayout>
+                <Button Text="+" 
+            Grid.Row="1" 
+            VerticalOptions="End" 
+            HorizontalOptions="End"
+            Margin="16"
+            Clicked="OnAddButtonClicked"/>
+            </Grid>
+            <VerticalStackLayout x:Name="EventDetails">
+
+            </VerticalStackLayout>
+        </VerticalStackLayout>
+    </ScrollView>
 </ContentPage>
