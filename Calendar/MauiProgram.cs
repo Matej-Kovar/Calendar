@@ -13,6 +13,8 @@ namespace Calendar
                 {
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                     fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
+                    fonts.AddFont("LexendGiga-Semibold.ttf", "LexendGiga");
+                    fonts.AddFont("Poppins-Semibold.ttf", "Poppins");
                 });
 
 #if DEBUG

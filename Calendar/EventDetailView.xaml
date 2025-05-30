@@ -3,12 +3,21 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Name="this"
              x:Class="Calendar.EventDetailView">
-    <VerticalStackLayout>
-        <Label Text="{Binding Source={x:Reference this}, Path=dayEvent.Name}"/>
-        <HorizontalStackLayout Spacing="8">
-            <Label Text="{Binding Source={x:Reference this}, Path=TimeRange}"/>
-            <Label Text="{Binding Source={x:Reference this}, Path=dayEvent.Place}"/>
-        </HorizontalStackLayout>
-        <Label Text="{Binding Source={x:Reference this}, Path=dayEvent.Description}"/>
-    </VerticalStackLayout>
+    <Border BackgroundColor="{Binding Source={x:Reference this}, Path=dayEvent.Color}"
+            Stroke="Transparent"
+            >
+        <Border.StrokeShape>
+            <RoundRectangle CornerRadius="8,8,8,8" />
+        </Border.StrokeShape>
+        <VerticalStackLayout Padding="16">
+            <VerticalStackLayout Spacing="-8">
+                <Label Text="{Binding Source={x:Reference this}, Path=dayEvent.Name}" Style="{DynamicResource TextBig}" TextColor="{DynamicResource TextOnColor}"/>
+                <HorizontalStackLayout Spacing="8">
+                    <Label Text="{Binding Source={x:Reference this}, Path=TimeRange}" Style="{DynamicResource TextSmall}" TextColor="{DynamicResource TextOnColor}"/>
+                    <Label Text="{Binding Source={x:Reference this}, Path=dayEvent.Place}" Style="{DynamicResource TextSmall}" TextColor="{DynamicResource TextOnColor}"/>
+                </HorizontalStackLayout>
+            </VerticalStackLayout>
+            <Label Text="{Binding Source={x:Reference this}, Path=dayEvent.Description}" TextColor="{DynamicResource TextOnColor}"/>
+        </VerticalStackLayout>
+    </Border>
 </ContentView>

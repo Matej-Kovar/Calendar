@@ -47,11 +47,10 @@ namespace Calendar.Model
         public bool IsCurrentMonth { get; set; }
 
         public Color Background =>
-            IsToday ? Color.FromRgba("#EAE2B7") :
-            !IsCurrentMonth ? Colors.LightGray :
+            IsToday ? (Color)Application.Current.Resources["PrimaryColor"] :
             Colors.Transparent;
-
-        public Brush Stroke => IsSelected ? Color.FromRgba("#F3D180") : Brush.Transparent;
+        public Double Opacity => IsCurrentMonth ? 1 : .5;
+        public Brush Stroke => IsSelected ? (Color)Application.Current.Resources["SecondaryColor"] : Brush.Transparent;
         public double StrokeThickness => IsSelected ? 3 : 1;
 
         public event PropertyChangedEventHandler? PropertyChanged;

@@ -18,6 +18,14 @@ namespace Calendar
             set { _selectdDay = value; UpdateEventList(); }
         }
 
+        DayEvent? _selectedEvent;
+
+        public DayEvent? SelectedEvent
+        {
+            get { return _selectedEvent; }
+            set { _selectedEvent = value; OnAddButtonClicked(null, null); }
+        }
+
         public ObservableCollection<DayEvent> Events = new ObservableCollection<DayEvent>();
 
         public MainPage()
@@ -40,15 +48,35 @@ namespace Calendar
 
         private async void OnAddButtonClicked(object sender, EventArgs e)
         {
-            await Shell.Current.GoToAsync(nameof(EventCreation));
+            await Shell.Current.GoToAsync(nameof(EventCreation), new Dictionary<string, object>
+            {
+                { "SelectedDate", SelectedDay },
+                { "SelectedEvent", SelectedEvent }
+            });
         }
 
-        public void ApplyQueryAttributes(IDictionary<string, object> query)
+        public void ApplyQueryAttributes(IDictionary<string, object?> query)
         {
-            if (query.ContainsKey("NewEvent"))
+            SelectedEvent = null;
+            if (query.TryGetValue("NewEvent", out var newObj) && newObj is DayEvent dayEvent)
             {
-                DayEvent dayEvent = (DayEvent)query["NewEvent"];
-                Events.Add(dayEvent);
+                bool replaced = false;
+
+                if (query.TryGetValue("OriginalEvent", out var origObj) && origObj is DayEvent originalEvent)
+                {
+                    int index = Events.IndexOf(originalEvent);
+                    if (index >= 0)
+                    {
+                        Events[index] = dayEvent;
+                        replaced = true;
+                    }
+                }
+
+                if (!replaced)
+                {
+                    Events.Add(dayEvent);
+                }
+
                 UpdateCalendar();
                 query.Clear();
             }
@@ -58,6 +86,7 @@ namespace Calendar
         {
             Calendar.Events = Events;
             Calendar.RenderCalendar();
+            UpdateEventList();
         }
 
         public void UpdateEventList()
@@ -65,12 +94,25 @@ namespace Calendar
             EventDetails.Children.Clear();
             if (Calendar is not null)
             {
-                foreach (DayEvent dayEvent in Calendar.Days.Where(d => d.Date == SelectedDay.Date).FirstOrDefault().Events)
+                var selectedDay = Calendar.Days.FirstOrDefault(d => d.Date == SelectedDay.Date);
+                if (selectedDay != null)
                 {
-                    var detail = new EventDetailView(dayEvent);
-                    EventDetails.Children.Add(detail);
+                    foreach (DayEvent dayEvent in selectedDay.Events)
+                    {
+                        var detail = new EventDetailView(dayEvent);
+                        detail.GestureRecognizers.Add(new TapGestureRecognizer
+                        {
+                            Command = new Command(() => OnEventSelected(dayEvent))
+                        });
+                        EventDetails.Children.Add(detail);
+                    }
                 }
             }
+        }
+
+        public void OnEventSelected(DayEvent selectedEvent)
+        {
+            SelectedEvent = selectedEvent;
         }
     }
 }

@@ -32,6 +32,16 @@ namespace Calendar
             }
         }
 
+        public string Header
+        {
+            get
+            {
+                string header = ControlDate.ToString("MMMM yyyy");
+                return CultureInfo.CurrentCulture.TextInfo.ToTitleCase(header);
+            }
+        }
+            
+
         public CalendarView()
         {
             DayNames = DateTimeFormatInfo.CurrentInfo.DayNames.Select(n => n.Substring(0, 3).ToUpper()).ToArray();
@@ -151,7 +161,6 @@ namespace Calendar
                 {
                     Text = DayNames[i],
                     FontSize = FontSize,
-                    FontAttributes = FontAttributes.Bold,
                     HorizontalTextAlignment = TextAlignment.Center
                 };
                 _calendarGrid.Children.Add(header);
@@ -177,20 +186,25 @@ namespace Calendar
             var label = new Label
             {
                 FontSize = FontSize,
+                Style = (Style)Application.Current.Resources["Number"],
+                Opacity = day.Opacity,
                 Text = day.Date.Day.ToString(),
+                TextColor = day.IsToday ? (Color)Application.Current.Resources["TextOnColor"] : (Color)Application.Current.Resources["TextColor"],
                 HorizontalTextAlignment = TextAlignment.Center,
-                VerticalTextAlignment = TextAlignment.Center
+                VerticalTextAlignment = TextAlignment.Center,
+                VerticalOptions = LayoutOptions.Center,
+                HorizontalOptions = LayoutOptions.Center
             };
 
             var border = new Border
             {
                 Stroke = day.Stroke,
-                StrokeThickness = FontSize / 8,
+                StrokeThickness = 2,
                 BackgroundColor = day.Background,
                 Padding = FontSize / 4,
                 WidthRequest = FontSize * 2.25,
                 HeightRequest = FontSize * 2.25,
-                StrokeShape = new RoundRectangle { CornerRadius = FontSize * 4.5 },
+                StrokeShape = new RoundRectangle { CornerRadius = FontSize * 4.25 },
                 Content = label,
                 BindingContext = day
             };
@@ -213,6 +227,7 @@ namespace Calendar
             }
 
             stack.Children.Add(border);
+
             if (GenerateEvents)
             {
                 var bubbleLayout = new FlexLayout
@@ -220,8 +235,8 @@ namespace Calendar
                     Wrap = FlexWrap.Wrap,
                     JustifyContent = FlexJustify.Center,
                     AlignItems = FlexAlignItems.Center,
-                    Padding = new Thickness(FontSize/2, 0, FontSize/2, 0)
-
+                    HeightRequest = 20,
+                    WidthRequest = 26
                 };
 
                 foreach (var e in day.Events.Take(6))
@@ -248,45 +263,50 @@ namespace Calendar
         public ICommand NextMonth => new Command(() => ControlDate = ControlDate.AddMonths(1));
         public ICommand PreviousMonth => new Command(() => ControlDate = ControlDate.AddMonths(-1));
 
-        HorizontalStackLayout generateControls()
+        FlexLayout generateControls()
         {
-            var layout = new HorizontalStackLayout
+            var layout = new FlexLayout
             {
-                HorizontalOptions = LayoutOptions.Center,
+                JustifyContent = FlexJustify.SpaceBetween,
                 Padding = FontSize / 2,
             };
 
             var previousButton = new Button
             {
+                HorizontalOptions = LayoutOptions.End,
                 Text = "<",
                 BindingContext = this,
-                HeightRequest = FontSize * 2,
-                WidthRequest = FontSize * 2
+                HeightRequest = FontSize * 2.25,
+                WidthRequest = FontSize * 2.25
             };
             previousButton.SetBinding(Button.CommandProperty, "PreviousMonth");
 
             var monthLabel = new Label
             {
-                FontAttributes = FontAttributes.Bold,
-                FontSize = FontSize,
-                Padding = FontSize * 0.75,
+                HorizontalOptions = LayoutOptions.Start,
+                FontSize = FontSize * 1.5,
                 BindingContext = this
             };
-            monthLabel.SetBinding(Label.TextProperty, new Binding("ControlDate", stringFormat: "{0:MMMM yyyy}"));
+            monthLabel.SetBinding(Label.TextProperty, new Binding("Header"));
 
             var nextButton = new Button
             {
+                HorizontalOptions = LayoutOptions.End,
                 Text = ">",
                 BindingContext = this,
-                HeightRequest = FontSize * 2,
-                WidthRequest = FontSize * 2
+                HeightRequest = FontSize * 2.25,
+                WidthRequest = FontSize * 2.25
 
             };
             nextButton.SetBinding(Button.CommandProperty, "NextMonth");
 
-            layout.Children.Add(previousButton);
+            var buttons = new HorizontalStackLayout();
+            buttons.Spacing = FontSize / 4;
+            buttons.Add(previousButton);
+            buttons.Add(nextButton);
+
             layout.Children.Add(monthLabel);
-            layout.Children.Add(nextButton);
+            layout.Children.Add(buttons);
 
             return layout;
         }

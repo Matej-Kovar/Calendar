@@ -7,9 +7,11 @@ using System.Globalization;
 
 namespace Calendar;
 
-public partial class EventCreation : ContentPage, INotifyPropertyChanged
+public partial class EventCreation : ContentPage, INotifyPropertyChanged, IQueryAttributable
 {
     public new event PropertyChangedEventHandler? PropertyChanged;
+
+    public DayEvent? OriginalEvent { get; set; } = null;
 
     public ObservableCollection<DayEvent> NewEvent { get; set; }
 
@@ -99,37 +101,48 @@ public partial class EventCreation : ContentPage, INotifyPropertyChanged
     }
     public InputSelected selectedInput { get; set; } = InputSelected.None;
     public int Repeat {  get; set; }
-    public Color Color { get; set; } = Colors.Black;
+    Color _color = (Color)Application.Current.Resources["Blue"];
+    public Color Color 
+    {
+        get {  return _color; }
+        set { _color = value; NewEvent[0].Color = _color; } 
+    }
 	public EventCreation()
 	{
         NewEvent = new ObservableCollection<DayEvent>
             { 
                 new DayEvent(StartDate, EndDate, "")
             };
-        colors.Add(Colors.Purple);
-        colors.Add(Colors.Orchid);
-        colors.Add(Colors.Pink);
-        colors.Add(Colors.Red);
-        colors.Add(Colors.Orange);
-        colors.Add(Colors.Yellow);
-        colors.Add(Colors.Green);
-        colors.Add(Colors.Blue);
-        colors.Add(Colors.Purple);
+        colors.Add((Color)Application.Current.Resources["Yellow"]);
+        colors.Add((Color)Application.Current.Resources["Orange"]);
+        colors.Add((Color)Application.Current.Resources["Pink"]);
+        colors.Add((Color)Application.Current.Resources["Magenta"]);
+        colors.Add((Color)Application.Current.Resources["Purple"]);
+        colors.Add((Color)Application.Current.Resources["Blue"]);
         InitializeComponent();
         RenderInput();
 	}
 
     private async void OnSubmitButtonClicked(object sender, EventArgs e)
     {
-        DayEvent newEvent = new DayEvent(StartDate, EndDate, EventName.Text); 
-        newEvent.Place = EventPlace.Text;
-        newEvent.Description = EventDescription.Text;
-        newEvent.Color = Color;
-        newEvent.RepeatAfter = Repeat;
-        await Shell.Current.GoToAsync("///MainPage", new Dictionary<string, object>
+        if(EventName.Text != null)
         {
-            { "NewEvent", newEvent }
-        });
+            DayEvent newEvent = new DayEvent(StartDate, EndDate, EventName.Text);
+            newEvent.Place = EventPlace.Text;
+            newEvent.Description = EventDescription.Text;
+            newEvent.Color = Color;
+            newEvent.RepeatAfter = Repeat;
+            await Shell.Current.GoToAsync("///MainPage", new Dictionary<string, object?>
+            {
+                { "NewEvent", newEvent },
+                { "OriginalEvent", OriginalEvent }
+            });
+        }
+        else
+        {
+            //do something
+        }
+        
     }
 
     private void OnInputSelected(object sender, EventArgs e)
@@ -187,5 +200,32 @@ public partial class EventCreation : ContentPage, INotifyPropertyChanged
             InputSection.Children.Add(colorSelector);
 
         }
+    }
+    public void ApplyQueryAttributes(IDictionary<string, object> query)
+    {
+        if (query.ContainsKey("SelectedDate"))
+        {
+            StartDate = (DateTime)query["SelectedDate"];
+            EndDate = StartDate;
+        }
+        if (query.ContainsKey("SelectedEvent"))
+        {
+            if(query["SelectedEvent"] is not null)
+            {
+                DayEvent loadedEvent = (DayEvent)query["SelectedEvent"];
+                OriginalEvent = loadedEvent;
+                Color = loadedEvent.Color;
+                //Repeat = loadedEvent.RepeatAfter;
+                StartDate = loadedEvent.StarDate;
+                EndDate = loadedEvent.EndDate;
+                StartTime = loadedEvent.StarDate;
+                EndTime = loadedEvent.EndDate;
+                NewEvent[0] = loadedEvent;
+                EventDescription.Text = loadedEvent.Description;
+                EventName.Text = loadedEvent.Name;
+                EventPlace.Text = loadedEvent.Place;
+            }
+        }
+        query.Clear();
     }
 }

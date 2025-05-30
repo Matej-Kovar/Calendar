@@ -22,7 +22,7 @@ namespace Calendar.Model
         public string? Description { get; set; }
         public string? Place { get; set; }
         public int? RepeatAfter {  get; set; }
-        public Color Color { get; set; } = Colors.Black;
+        public Color Color { get; set; } = (Color)Application.Current.Resources["PrimaryColor"];
 
         public bool isInRange(DateTime date)
         {
