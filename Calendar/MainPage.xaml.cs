@@ -78,8 +78,16 @@ namespace Calendar
                 }
 
                 UpdateCalendar();
-                query.Clear();
             }
+            else if (query.TryGetValue("Remove?", out var temp) && temp is bool remove)
+            {
+                if (remove && query.TryGetValue("OriginalEvent", out var origObj) && origObj is DayEvent originalEvent)
+                {
+                    Events.Remove(originalEvent);
+                    UpdateCalendar();
+                }
+            }
+                query.Clear();
         }
 
         public void UpdateCalendar()

@@ -7,17 +7,19 @@
              Shell.NavBarIsVisible="False">
     <ScrollView>
         <VerticalStackLayout Spacing="8" Padding="16">
-        <FlexLayout >
-            <Label Text="Událost" Style="{DynamicResource TextBig}" FlexLayout.Grow="1"/>
-            <Button Text="&#xe901;"
+        <FlexLayout>
+                <Label Text="Událost" Style="{DynamicResource TextBig}" FlexLayout.Grow="1"/>
+                <HorizontalStackLayout Spacing="4" x:Name="Controls">
+                    <Button Text="&#xe901;"
                     Clicked="OnBackButtonClicked"
-                    Style="{DynamicResource IconButton}" Margin="0, 0, 4, 0"/>
-            <Button Text="&#xe903;"
+                    Style="{DynamicResource IconButton}"/>
+                    <Button Text="&#xe903;"
                     Clicked="OnSubmitButtonClicked"
                     Style="{DynamicResource IconButton}"/>
-        </FlexLayout>
+                </HorizontalStackLayout>
+            </FlexLayout>
         <FlexLayout >
-            <Border Style="{DynamicResource EntryBorderPadding}" FlexLayout.Grow="1" Margin="0, 0, 4, 0">
+            <Border Style="{DynamicResource EntryBorderPadding}" FlexLayout.Grow="1" Margin="0, 0, 4, 0" x:Name="EventNameBorder">
             <Entry Placeholder="Název"
                    x:Name="EventName"/>
             </Border>

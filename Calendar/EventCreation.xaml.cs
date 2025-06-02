@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
+using System.Security.Cryptography.X509Certificates;
 
 namespace Calendar;
 
@@ -140,7 +141,8 @@ public partial class EventCreation : ContentPage, INotifyPropertyChanged, IQuery
         }
         else
         {
-            //do something
+            EventNameBorder.Stroke = (Color)Application.Current.Resources["Pink"];
+            EventNameBorder.StrokeThickness = 2;
         }
         
     }
@@ -228,8 +230,30 @@ public partial class EventCreation : ContentPage, INotifyPropertyChanged, IQuery
                 EventDescription.Text = loadedEvent.Description;
                 EventName.Text = loadedEvent.Name;
                 EventPlace.Text = loadedEvent.Place;
+                IsModifying();
             }
         }
         query.Clear();
+    }
+    
+    public void IsModifying()
+    {
+        var button = new Button
+        {
+            Text = "\ue904",
+            Style = (Style)Application.Current.Resources["IconButton"],
+        };
+        button.Clicked += OnRemoveButtonClicked;
+        Controls.Children.Add(Controls.Children[1]);
+        Controls.Children[1] = (button);
+    }
+
+    public async void OnRemoveButtonClicked(object? sender, EventArgs e)
+    {
+        await Shell.Current.GoToAsync("///MainPage", new Dictionary<string, object?>
+        {
+                { "Remove?", true },
+                { "OriginalEvent", OriginalEvent }
+        });
     }
 }

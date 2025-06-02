@@ -189,19 +189,22 @@ namespace Calendar
                 Style = (Style)Application.Current.Resources["Number"],
                 Opacity = day.Opacity,
                 Text = day.Date.Day.ToString(),
-                TextColor = day.IsToday ? (Color)Application.Current.Resources["TextOnColor"] : (Color)Application.Current.Resources["TextColor"],
                 HorizontalTextAlignment = TextAlignment.Center,
                 VerticalTextAlignment = TextAlignment.Center,
                 VerticalOptions = LayoutOptions.Center,
                 HorizontalOptions = LayoutOptions.Center
             };
+            if (day.IsToday)
+            {
+                label.Style = (Style)Application.Current.Resources["TextOnColorStyle"];
+            }
 
             var border = new Border
             {
                 Stroke = day.Stroke,
-                StrokeThickness = 2,
+                StrokeThickness = 3,
                 BackgroundColor = day.Background,
-                Padding = FontSize / 4,
+                Padding = FontSize / 8,
                 WidthRequest = FontSize * 2.25,
                 HeightRequest = FontSize * 2.25,
                 StrokeShape = new RoundRectangle { CornerRadius = FontSize * 4.25 },

@@ -20,21 +20,23 @@
         </Grid.ColumnDefinitions>
         <Label Text="Vyberte čas" Grid.ColumnSpan="3"/>
         <Button Grid.ColumnSpan="3" Grid.Row="3" Text="Potvrdit" HorizontalOptions="Fill" Clicked="OnSubmitButtonClicked"/>
-        <Border Style="{DynamicResource EntryBorder}" Grid.Row="1" WidthRequest="54">
+        <Border Style="{DynamicResource EntryBorder}" Grid.Row="1">
             <Entry 
                FontSize="24" 
-                WidthRequest="16"
                x:Name="HoursEntry"
+               HorizontalTextAlignment="Center"
                TextChanged="HoursEntry_TextChanged"
+                MinimumWidthRequest="48"
                Style="{DynamicResource Time}"/>
         </Border>
         <Label Text=":" Grid.Row="1" Grid.Column="1" FontSize="32" VerticalOptions="Center"/>
-        <Border Style="{DynamicResource EntryBorder}" Grid.Row="1" Grid.Column="2" WidthRequest="54">
+        <Border Style="{DynamicResource EntryBorder}" Grid.Row="1" Grid.Column="2">
             <Entry 
                FontSize="24" 
-               WidthRequest="16"
                x:Name="MinutesEntry"
+                HorizontalTextAlignment="Center"
                TextChanged="MinutesEntry_TextChanged"
+                MinimumWidthRequest="48"
                Style="{DynamicResource Time}"/>
         </Border>
         <Label Text="Hodiny" Grid.Row="2" Grid.Column="0" HorizontalOptions="Center"/>
