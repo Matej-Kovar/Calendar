@@ -48,7 +48,7 @@ namespace Calendar
 
         private async void OnAddButtonClicked(object sender, EventArgs e)
         {
-            await Shell.Current.GoToAsync(nameof(EventCreation), new Dictionary<string, object>
+            await Shell.Current.GoToAsync(nameof(EventCreation), new Dictionary<string, object?>
             {
                 { "SelectedDate", SelectedDay },
                 { "SelectedEvent", SelectedEvent }
@@ -97,14 +97,28 @@ namespace Calendar
                 var selectedDay = Calendar.Days.FirstOrDefault(d => d.Date == SelectedDay.Date);
                 if (selectedDay != null)
                 {
-                    foreach (DayEvent dayEvent in selectedDay.Events)
+                    if (selectedDay.Events.Count == 0)
                     {
-                        var detail = new EventDetailView(dayEvent);
-                        detail.GestureRecognizers.Add(new TapGestureRecognizer
+                        EventDetails.Children.Add(new Label
                         {
-                            Command = new Command(() => OnEventSelected(dayEvent))
+                            Text = "Na tento den není naplánovaná událost",
+                            Opacity = .5,
+                            //VerticalOptions = LayoutOptions.Center,
+                            HorizontalOptions = LayoutOptions.Center,
+                           
                         });
-                        EventDetails.Children.Add(detail);
+                    }
+                    else
+                    {
+                        foreach (DayEvent dayEvent in selectedDay.Events)
+                        {
+                            var detail = new EventDetailView(dayEvent);
+                            detail.GestureRecognizers.Add(new TapGestureRecognizer
+                            {
+                                Command = new Command(() => OnEventSelected(dayEvent))
+                            });
+                            EventDetails.Children.Add(detail);
+                        }
                     }
                 }
             }

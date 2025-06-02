@@ -105,7 +105,7 @@ public partial class EventCreation : ContentPage, INotifyPropertyChanged, IQuery
     public Color Color 
     {
         get {  return _color; }
-        set { _color = value; NewEvent[0].Color = _color; } 
+        set { _color = value; NewEvent[0].Color = _color; PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Color))); } 
     }
 	public EventCreation()
 	{
@@ -125,7 +125,7 @@ public partial class EventCreation : ContentPage, INotifyPropertyChanged, IQuery
 
     private async void OnSubmitButtonClicked(object sender, EventArgs e)
     {
-        if(EventName.Text != null)
+        if(EventName.Text != null && EventName.Text != string.Empty)
         {
             DayEvent newEvent = new DayEvent(StartDate, EndDate, EventName.Text);
             newEvent.Place = EventPlace.Text;
@@ -143,6 +143,10 @@ public partial class EventCreation : ContentPage, INotifyPropertyChanged, IQuery
             //do something
         }
         
+    }
+    private async void OnBackButtonClicked(object sender, EventArgs e)
+    {
+        await Shell.Current.GoToAsync("///MainPage");
     }
 
     private void OnInputSelected(object sender, EventArgs e)

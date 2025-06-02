@@ -274,8 +274,9 @@ namespace Calendar
             var previousButton = new Button
             {
                 HorizontalOptions = LayoutOptions.End,
-                Text = "<",
+                Text = "\ue901",
                 BindingContext = this,
+                Style = (Style)Application.Current.Resources["IconButton"],
                 HeightRequest = FontSize * 2.25,
                 WidthRequest = FontSize * 2.25
             };
@@ -292,8 +293,9 @@ namespace Calendar
             var nextButton = new Button
             {
                 HorizontalOptions = LayoutOptions.End,
-                Text = ">",
+                Text = "\ue902",
                 BindingContext = this,
+                Style = (Style)Application.Current.Resources["IconButton"],
                 HeightRequest = FontSize * 2.25,
                 WidthRequest = FontSize * 2.25
 

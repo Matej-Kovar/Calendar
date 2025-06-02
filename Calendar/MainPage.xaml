@@ -7,25 +7,15 @@
              Background="{DynamicResource BackgroundColor}"
              >
     <ScrollView>
-        <VerticalStackLayout Padding="16">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="*" />
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-                <StackLayout x:Name="CalendarHolder" Background="Transparent" Grid.Row="0">
-                </StackLayout>
-                <Button Text="+" 
-            Grid.Row="1" 
-            VerticalOptions="End" 
-            HorizontalOptions="End"
-            Margin="16"
-            Clicked="OnAddButtonClicked"/>
-            </Grid>
-            <VerticalStackLayout x:Name="EventDetails">
+        <VerticalStackLayout Padding="24">
+            <StackLayout x:Name="CalendarHolder" Background="Transparent"></StackLayout>
+            <FlexLayout JustifyContent="SpaceBetween">
+                <Label Text="Události" Style="{DynamicResource TextBig}"/>
+                <Button Text="&#xe900;" 
+                        Style="{DynamicResource IconButton}"
+                        Clicked="OnAddButtonClicked"/>
+            </FlexLayout>
+            <VerticalStackLayout x:Name="EventDetails" Padding="0, 8, 0, 8" Spacing="4">
 
             </VerticalStackLayout>
         </VerticalStackLayout>

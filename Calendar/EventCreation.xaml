@@ -3,38 +3,34 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Calendar.EventCreation"
              x:Name="this"
-             Title="EventCreation"
-             Padding="16">
-    <ContentPage.Resources>
-        <Style TargetType="Label">
-            <Setter Property="TextColor" Value="#003049" />
-        </Style>
-        <Style TargetType="Button">
-            <Setter Property="BackgroundColor" Value="White" />
-            <Setter Property="TextColor" Value="#003049" />
-        </Style>
-    </ContentPage.Resources>
-    <VerticalStackLayout Spacing="8">
+             Background="{DynamicResource BackgroundColor}"
+             Shell.NavBarIsVisible="False">
+    <ScrollView>
+        <VerticalStackLayout Spacing="8" Padding="16">
         <FlexLayout >
-            <Entry Placeholder="Název" 
-                   FlexLayout.Grow="1" 
-                   Margin="0,0,8,0"
-                   x:Name="EventName"/>
-            <Button Text="+"
+            <Label Text="Událost" Style="{DynamicResource TextBig}" FlexLayout.Grow="1"/>
+            <Button Text="&#xe901;"
+                    Clicked="OnBackButtonClicked"
+                    Style="{DynamicResource IconButton}" Margin="0, 0, 4, 0"/>
+            <Button Text="&#xe903;"
                     Clicked="OnSubmitButtonClicked"
-                    HeightRequest="42"
-                    WidthRequest="42"/>
+                    Style="{DynamicResource IconButton}"/>
         </FlexLayout>
-        <Entry Placeholder="Popis" 
+        <FlexLayout >
+            <Border Style="{DynamicResource EntryBorderPadding}" FlexLayout.Grow="1" Margin="0, 0, 4, 0">
+            <Entry Placeholder="Název"
+                   x:Name="EventName"/>
+            </Border>
+            <Button Clicked="OnInputSelected" 
+                    CommandParameter="Color"
+                    BackgroundColor="{Binding Source={x:Reference this}, Path=Color}" CornerRadius="40" WidthRequest="40" HeightRequest="40" />
+
+        </FlexLayout>
+        <Border Style="{DynamicResource EntryBorderPadding}">
+            <Entry Placeholder="Popis" 
                x:Name="EventDescription"/>
-        <FlexLayout>
-            <HorizontalStackLayout Spacing="4" Padding="0,4,0,4" FlexLayout.Grow="1">
-                <Label Text="Opakovat každé"/>
-                <Label Text="4 dny"/>
-            </HorizontalStackLayout>
-            <Button Text="Barva" Clicked="OnInputSelected" CommandParameter="Color"/>
-        </FlexLayout>
-        <FlexLayout>
+        </Border>
+        <FlexLayout Wrap="Wrap">
             <VerticalStackLayout FlexLayout.Grow="1">
                 <Label Text="Od"/>
                 <HorizontalStackLayout Spacing="4">
@@ -57,6 +53,9 @@
         <StackLayout x:Name="InputSection">
             
         </StackLayout>
+        <Border Style="{DynamicResource EntryBorderPadding}">
         <Entry Placeholder="Místo" x:Name="EventPlace"/>
+        </Border>
     </VerticalStackLayout>
+    </ScrollView>
 </ContentPage>

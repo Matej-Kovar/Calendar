@@ -35,6 +35,11 @@ public partial class EventDetailView : ContentView
     public EventDetailView(DayEvent dayEvent)
 	{
 		this.dayEvent = dayEvent;
-		InitializeComponent();
+        InitializeComponent();
+        if (dayEvent.Description == null || dayEvent.Description == string.Empty)
+        {
+            DescriptionLabel.HeightRequest = 0;
+        }
+		
 	}
 }

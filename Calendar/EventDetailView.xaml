@@ -17,7 +17,7 @@
                     <Label Text="{Binding Source={x:Reference this}, Path=dayEvent.Place}" Style="{DynamicResource TextSmall}" TextColor="{DynamicResource TextOnColor}"/>
                 </HorizontalStackLayout>
             </VerticalStackLayout>
-            <Label Text="{Binding Source={x:Reference this}, Path=dayEvent.Description}" TextColor="{DynamicResource TextOnColor}"/>
+            <Label Text="{Binding Source={x:Reference this}, Path=dayEvent.Description}" TextColor="{DynamicResource TextOnColor}" x:Name="DescriptionLabel"/>
         </VerticalStackLayout>
     </Border>
 </ContentView>

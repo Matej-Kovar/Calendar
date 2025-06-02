@@ -42,8 +42,8 @@ public class ColorSelectionView : ContentView
 				Fill = color,
 				HeightRequest = 48,
 				WidthRequest = 48,
-				Stroke = SelectedColor == color ? Colors.Black: Colors.Transparent,
-				StrokeThickness = 3,
+				Stroke = SelectedColor == color ? (Color)Application.Current.Resources["TextColor"] : Colors.Transparent,
+				StrokeThickness = 4,
 				RadiusX = 8,
 				RadiusY = 8,
 				Margin = 1
