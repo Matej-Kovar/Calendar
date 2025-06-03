@@ -3,6 +3,7 @@ using Calendar.ViewModel;
 using Microsoft.Maui.Controls.Handlers.Items;
 using Microsoft.Maui.Controls.Shapes;
 using System.Collections.ObjectModel;
+using System.Text.Json;
 using System.Windows.Input;
 
 namespace Calendar
@@ -11,19 +12,21 @@ namespace Calendar
     {
         CalendarView Calendar;
 
-        DateTime _selectdDay = DateTime.Now;
+        string path = System.IO.Path.Combine(FileSystem.AppDataDirectory, "events.json");
+
+        DateTime selectdDay = DateTime.Now;
         public DateTime SelectedDay
         {
-            get {  return _selectdDay; }
-            set { _selectdDay = value; UpdateEventList(); }
+            get {  return selectdDay; }
+            set { selectdDay = value; UpdateEventList(); }
         }
 
-        DayEvent? _selectedEvent;
+        DayEvent? selectedEvent;
 
         public DayEvent? SelectedEvent
         {
-            get { return _selectedEvent; }
-            set { _selectedEvent = value; OnAddButtonClicked(null, null); }
+            get { return selectedEvent; }
+            set { selectedEvent = value; OnAddButtonClicked(new object(), new EventArgs()); }
         }
 
         public ObservableCollection<DayEvent> Events = new ObservableCollection<DayEvent>();
@@ -31,6 +34,20 @@ namespace Calendar
         public MainPage()
         {
             InitializeComponent();
+            /*Events.Add(new DayEvent {
+                Name = "Repeating Event",
+                Description = "This event should repeat every 3,1 days",
+                StarDate = DateTime.Now,
+                EndDate = DateTime.Now.AddMinutes(8),
+                RepeatAfter = [7],
+                Color = (Color)Application.Current.Resources["Yellow"]
+
+            });*/
+            var temp = LoadEvents(path);
+            foreach (DayEvent e in temp)
+            {
+                Events.Add(e);
+            }
             Calendar = new CalendarView
             {
                 Events = Events,
@@ -42,6 +59,7 @@ namespace Calendar
                 new Binding(nameof(SelectedDay), source: this, mode: BindingMode.TwoWay)
             );
             CalendarHolder.Children.Add(Calendar);
+
             Calendar.RenderCalendar();
             UpdateEventList();
         }
@@ -69,12 +87,14 @@ namespace Calendar
                     {
                         Events[index] = dayEvent;
                         replaced = true;
+                        //modify saved event
                     }
                 }
 
                 if (!replaced)
                 {
                     Events.Add(dayEvent);
+                    //add event to saved events
                 }
 
                 UpdateCalendar();
@@ -84,6 +104,7 @@ namespace Calendar
                 if (remove && query.TryGetValue("OriginalEvent", out var origObj) && origObj is DayEvent originalEvent)
                 {
                     Events.Remove(originalEvent);
+                    //remove event from saved events
                     UpdateCalendar();
                 }
             }
@@ -93,6 +114,7 @@ namespace Calendar
         public void UpdateCalendar()
         {
             Calendar.Events = Events;
+            SaveEvents(path);
             Calendar.RenderCalendar();
             UpdateEventList();
         }
@@ -135,6 +157,27 @@ namespace Calendar
         public void OnEventSelected(DayEvent selectedEvent)
         {
             SelectedEvent = selectedEvent;
+        }
+
+        public List<DayEvent> LoadEvents(string path)
+        {
+            List<DayEvent> loadedEvents = new List<DayEvent>();
+            if(File.Exists(path))
+            {
+                string json = File.ReadAllText(path);
+                var temp = JsonSerializer.Deserialize<List<DayEvent>>(json);;
+                if(temp != null)
+                {
+                    loadedEvents = temp;
+                }
+            }
+            return loadedEvents;
+        }
+
+        public void SaveEvents(string path)
+        {
+            var json = JsonSerializer.Serialize(Events.ToList()/*, new JsonSerializerOptions { WriteIndented = true }*/);
+            File.WriteAllTextAsync(path, json);
         }
     }
 }

@@ -65,16 +65,16 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Compile Update="EventCreation.xaml.cs">
+	  <Compile Update="Views\EventCreation.xaml.cs">
 	    <DependentUpon>EventCreation.xaml</DependentUpon>
 	  </Compile>
 	</ItemGroup>
 
 	<ItemGroup>
-	  <MauiXaml Update="EventCreation.xaml">
+	  <MauiXaml Update="Views\EventCreation.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	  <MauiXaml Update="EventDetailView.xaml">
+	  <MauiXaml Update="Controls\EventDetailView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Resources\Styles\AppStyles.xaml">
@@ -89,7 +89,7 @@
 	  <MauiXaml Update="Resources\Styles\LightColors.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	  <MauiXaml Update="TimeSelectionView.xaml">
+	  <MauiXaml Update="Controls\TimeSelectionView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	</ItemGroup>

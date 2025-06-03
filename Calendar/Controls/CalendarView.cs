@@ -13,21 +13,22 @@ namespace Calendar
 {
     public partial class CalendarView : ContentView
     {
-        private readonly Grid _calendarGrid = new();
+        private readonly Grid calendarGrid = new();
 
-        VerticalStackLayout _verticalStackLayout = new();
+        VerticalStackLayout verticalStackLayout = new();
 
-        private DateTime _controlDate = DateTime.Now;
+        private DateTime controlDate = DateTime.Now;
         public DateTime ControlDate
         {
-            get => _controlDate;
+            get => controlDate;
             set
             {
-                if (_controlDate != value)
+                if (controlDate != value)
                 {
-                    _controlDate = value;
+                    controlDate = value;
                     OnPropertyChanged(nameof(ControlDate));
-                    RenderCalendar();
+                    OnPropertyChanged(nameof(Header));
+                    Dispatcher.Dispatch(() => RenderCalendar());
                 }
             }
         }
@@ -45,11 +46,10 @@ namespace Calendar
         public CalendarView()
         {
             DayNames = DateTimeFormatInfo.CurrentInfo.DayNames.Select(n => n.Substring(0, 3).ToUpper()).ToArray();
-            _verticalStackLayout.Children.Clear();
-            _verticalStackLayout.Children.Add(generateControls());
-            _verticalStackLayout.Children.Add(_calendarGrid);
-            Content = _verticalStackLayout;
-            Dispatcher.Dispatch(() => RenderCalendar());
+            verticalStackLayout.Children.Clear();
+            verticalStackLayout.Children.Add(generateControls());
+            verticalStackLayout.Children.Add(calendarGrid);
+            Content = verticalStackLayout;
         }
 
         public static readonly BindableProperty GenerateEventsProperty =
@@ -80,8 +80,7 @@ namespace Calendar
         private static void OnSelectedDayChanged(BindableObject bindable, object oldValue, object newValue)
         {
             var calendar = (CalendarView)bindable;
-            
-            calendar.Dispatcher.Dispatch(() => calendar.RenderCalendar());
+            calendar.ControlDate = calendar.SelectedDay.Date;
         }
 
         public DateTime SelectedDay
@@ -143,16 +142,17 @@ namespace Calendar
 
         public void RenderCalendar()
         {
+            Debug.WriteLine("Started calendar rendering");
             LoadMonth(ControlDate, Events);
 
-            _calendarGrid.Children.Clear();
-            _calendarGrid.RowDefinitions.Clear();
-            _calendarGrid.ColumnDefinitions.Clear();
+            calendarGrid.Children.Clear();
+            calendarGrid.RowDefinitions.Clear();
+            calendarGrid.ColumnDefinitions.Clear();
 
             for (int i = 0; i < 7; i++)
             {
-                _calendarGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Star });
-                _calendarGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+                calendarGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Star });
+                calendarGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
             }
 
             for (int i = 0; i < 7; i++)
@@ -163,7 +163,7 @@ namespace Calendar
                     FontSize = FontSize,
                     HorizontalTextAlignment = TextAlignment.Center
                 };
-                _calendarGrid.Children.Add(header);
+                calendarGrid.Children.Add(header);
                 Grid.SetColumn(header, i);
                 Grid.SetRow(header, 0);
             }
@@ -175,10 +175,11 @@ namespace Calendar
                 var day = Days[i];
                 var dayView = RenderDay(day);
 
-                _calendarGrid.Children.Add(dayView);
+                calendarGrid.Children.Add(dayView);
                 Grid.SetRow(dayView, row);
                 Grid.SetColumn(dayView, col);
             }
+            Debug.WriteLine("Finished calendar rendering");
         }
 
         private View RenderDay(CalendarDay day)
@@ -186,7 +187,7 @@ namespace Calendar
             var label = new Label
             {
                 FontSize = FontSize,
-                Style = (Style)Application.Current.Resources["Number"],
+                Style = Application.Current!.Resources["Number"] as Style,
                 Opacity = day.Opacity,
                 Text = day.Date.Day.ToString(),
                 HorizontalTextAlignment = TextAlignment.Center,
@@ -279,7 +280,7 @@ namespace Calendar
                 HorizontalOptions = LayoutOptions.End,
                 Text = "\ue901",
                 BindingContext = this,
-                Style = (Style)Application.Current.Resources["IconButton"],
+                Style = (Style)Application.Current!.Resources["IconButton"],
                 HeightRequest = FontSize * 2.25,
                 WidthRequest = FontSize * 2.25
             };
@@ -315,5 +316,7 @@ namespace Calendar
 
             return layout;
         }
+
+
     }
 }

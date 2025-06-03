@@ -1,6 +1,6 @@
 using Microsoft.Maui.Controls.Shapes;
 
-namespace Calendar;
+namespace Calendar.Views;
 
 public class ColorSelectionView : ContentView
 {
