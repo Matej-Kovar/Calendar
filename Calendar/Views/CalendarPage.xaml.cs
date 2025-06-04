@@ -152,7 +152,7 @@ namespace Calendar
         public List<DayEvent> LoadEvents(string path)
         {
             List<DayEvent> loadedEvents = new List<DayEvent>();
-            if(File.Exists(path))
+            if(/*File.Exists(path)*/false)
             {
                 string json = File.ReadAllText(path);
                 var temp = JsonSerializer.Deserialize<List<DayEvent>>(json);;

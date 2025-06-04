@@ -25,7 +25,7 @@
                 </Border>
                 <Button Clicked="OnInputSelected" 
                     CommandParameter="Color"
-                    BackgroundColor="{Binding Source={x:Reference this}, Path=Color}" CornerRadius="40" WidthRequest="40" HeightRequest="40" />
+                    BackgroundColor="{Binding Source={x:Reference this}, Path=viewModel.Color}" CornerRadius="40" WidthRequest="40" HeightRequest="40" />
 
             </FlexLayout>
             <Border Style="{DynamicResource EntryBorderPadding}">
@@ -36,18 +36,18 @@
                 <VerticalStackLayout FlexLayout.Grow="1">
                     <Label Text="Od"/>
                     <HorizontalStackLayout Spacing="4">
-                        <Button Text="{Binding Source={x:Reference this}, Path=StartDate.Date, StringFormat='{0:dd.MM.yyyy}'}"
+                        <Button Text="{Binding Source={x:Reference this}, Path=viewModel.StartDate.Date, StringFormat='{0:dd.MM.yyyy}'}"
                             Clicked="OnInputSelected" CommandParameter="StartDate"/>
-                        <Button Text="{Binding Source={x:Reference this}, Path=StartTime.TimeOfDay, StringFormat='{0:hh\\:mm}'}"
+                        <Button Text="{Binding Source={x:Reference this}, Path=viewModel.StartTime.TimeOfDay, StringFormat='{0:hh\\:mm}'}"
                             Clicked="OnInputSelected" CommandParameter="StartTime"/>
                     </HorizontalStackLayout>
                 </VerticalStackLayout>
                 <VerticalStackLayout FlexLayout.Grow="1">
                     <Label Text="Do"/>
                     <HorizontalStackLayout Spacing="4">
-                        <Button Text="{Binding Source={x:Reference this}, Path=EndDate.Date, StringFormat='{0:dd.MM.yyyy}'}"
+                        <Button Text="{Binding Source={x:Reference this}, Path=viewModel.EndDate.Date, StringFormat='{0:dd.MM.yyyy}'}"
                             Clicked="OnInputSelected" CommandParameter="EndDate"/>
-                        <Button Text="{Binding Source={x:Reference this}, Path=EndTime.TimeOfDay, StringFormat='{0:hh\\:mm}'}"
+                        <Button Text="{Binding Source={x:Reference this}, Path=viewModel.EndTime.TimeOfDay, StringFormat='{0:hh\\:mm}'}"
                             Clicked="OnInputSelected" CommandParameter="EndTime"/>
                     </HorizontalStackLayout>
                 </VerticalStackLayout>
