@@ -1,17 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using Calendar.Models;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Calendar.Model
+namespace Calendar.ViewModels
 {
-    public class CalendarDay : INotifyPropertyChanged
+    public class DayViewModel : INotifyPropertyChanged
     {
-        public DateTime Date { get; set; }
+        private readonly DayModel _model;
 
-        public List<DayEvent> Events { get; set; } = new List<DayEvent>();  
+        public DateTime Date => _model.Date;
+        public List<DayEvent> Events => _model.Events;
+
+        public DayViewModel(DayModel model)
+        {
+            _model = model;
+        }
 
         private bool _isSelected;
         public bool IsSelected
@@ -49,12 +56,15 @@ namespace Calendar.Model
         public Color Background =>
             IsToday ? (Color)Application.Current.Resources["PrimaryColor"] :
             Colors.Transparent;
-        public Double Opacity => IsCurrentMonth ? 1 : .5;
+
+        public double Opacity => IsCurrentMonth ? 1 : 0.5;
+
         public Brush Stroke => IsSelected ? (Color)Application.Current.Resources["SecondaryColor"] : Brush.Transparent;
+
         public double StrokeThickness => IsSelected ? 3 : 1;
 
         public event PropertyChangedEventHandler? PropertyChanged;
-        void OnPropertyChanged(string name) =>
+        private void OnPropertyChanged(string name) =>
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
     }
 }

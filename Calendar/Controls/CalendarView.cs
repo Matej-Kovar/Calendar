@@ -1,5 +1,5 @@
-using Calendar.Model;
-using Calendar.ViewModel;
+using Calendar.Models;
+using Calendar.ViewModels;
 using Microsoft.Maui.Controls;
 using Microsoft.Maui.Controls.Shapes;
 using Microsoft.Maui.Layouts;
@@ -17,39 +17,42 @@ namespace Calendar
 
         VerticalStackLayout verticalStackLayout = new();
 
-        private DateTime controlDate = DateTime.Now;
-        public DateTime ControlDate
+        private CalendarViewModel viewModel = new();
+        public CalendarViewModel ViewModel => viewModel;
+
+        public ObservableCollection<DayEvent> Events
         {
-            get => controlDate;
+            get => ViewModel.Events;
             set
             {
-                if (controlDate != value)
-                {
-                    controlDate = value;
-                    OnPropertyChanged(nameof(ControlDate));
-                    OnPropertyChanged(nameof(Header));
-                    Dispatcher.Dispatch(() => RenderCalendar());
-                }
+                ViewModel.Events = value;
+                ViewModel.LoadMonth();
+                Dispatcher.Dispatch(() => RenderCalendar());
             }
         }
 
-        public string Header
+        public DateTime SelectedDay
         {
-            get
-            {
-                string header = ControlDate.ToString("MMMM yyyy");
-                return CultureInfo.CurrentCulture.TextInfo.ToTitleCase(header);
-            }
+            get => ViewModel.SelectedDay;
+            set { ViewModel.SelectedDay = value; viewModel.LoadMonth(); }
         }
-            
-
         public CalendarView()
         {
-            DayNames = DateTimeFormatInfo.CurrentInfo.DayNames.Select(n => n.Substring(0, 3).ToUpper()).ToArray();
+            BindingContext = viewModel;
+
             verticalStackLayout.Children.Clear();
             verticalStackLayout.Children.Add(generateControls());
             verticalStackLayout.Children.Add(calendarGrid);
             Content = verticalStackLayout;
+
+            viewModel.PropertyChanged += (s, e) =>
+            {
+                if (e.PropertyName == nameof(viewModel.Days) || e.PropertyName == nameof(viewModel.ControlDate) || e.PropertyName == nameof(viewModel.Events))
+                {
+                    Dispatcher.Dispatch(() => RenderCalendar());
+                }
+            };
+            //Dispatcher.Dispatch(() => RenderCalendar());
         }
 
         public static readonly BindableProperty GenerateEventsProperty =
@@ -57,73 +60,17 @@ namespace Calendar
 
         public static readonly BindableProperty FontSizeProperty =
             BindableProperty.Create(nameof(FontSize), typeof(double), typeof(CalendarView), 16.0);
-        public List<CalendarDay> Days { get; set; } = new List<CalendarDay>();
 
-        public static readonly BindableProperty EventsProperty =
-            BindableProperty.Create(
-            nameof(Events),
-            typeof(ObservableCollection<DayEvent>),
-            typeof(CalendarView),
-            new ObservableCollection<DayEvent>(),
-            BindingMode.TwoWay
-        );
-
-        public static readonly BindableProperty SelectedDayProperty =
-            BindableProperty.Create(
-                nameof(SelectedDay),
-                typeof(DateTime),
-                typeof(CalendarView),
-                DateTime.Now,
-                BindingMode.TwoWay,
-                propertyChanged: OnSelectedDayChanged
-            );
         private static void OnSelectedDayChanged(BindableObject bindable, object oldValue, object newValue)
         {
             var calendar = (CalendarView)bindable;
-            calendar.ControlDate = calendar.SelectedDay.Date;
+            calendar.viewModel.ControlDate = calendar.viewModel.SelectedDay.Date;
         }
 
-        public DateTime SelectedDay
+        private static void OnEventsChanged(BindableObject bindable, object oldValue, object newValue)
         {
-            get => (DateTime)GetValue(SelectedDayProperty);
-            set => SetValue(SelectedDayProperty, value);
-        }
-
-        public void LoadMonth(DateTime month, ObservableCollection<DayEvent> events)
-        {
-            Days.Clear();
-            var firstOfMonth = new DateTime(month.Year, month.Month, 1);
-            var lastOfMonth = new DateTime(month.Year, month.Month, DateTime.DaysInMonth(month.Year, month.Month));
-            int offsetBefore = (int)firstOfMonth.DayOfWeek;
-            int offsetAfter = 7 - (int)lastOfMonth.DayOfWeek;
-            var startDate = firstOfMonth.AddDays(-offsetBefore);
-            int total = DateTime.DaysInMonth(month.Year, month.Month) + offsetAfter + offsetBefore - 1;
-
-            for (int i = 0; i < total; i++)
-            {
-                var date = startDate.AddDays(i);
-                Days.Add(new CalendarDay
-                {
-                    Events = events.Where(e => e.isInRange(date)).ToList(),
-                    Date = date,
-                    IsCurrentMonth = date.Month == month.Month,
-                    IsToday = date.Date == DateTime.Now.Date,
-                    IsSelected = date.Date == SelectedDay.Date
-                });
-            }
-        }
-
-        public void SetSelectedDay(CalendarDay tappedDay)
-        {
-            SelectedDay = tappedDay.Date;
-            foreach (var day in Days)
-                day.IsSelected = false;
-            tappedDay.IsSelected = true;
-        }
-        public ObservableCollection<DayEvent> Events
-        {
-            get => (ObservableCollection<DayEvent>)GetValue(EventsProperty);
-            set => SetValue(EventsProperty, value);
+            var calendar = (CalendarView)bindable;
+            calendar.Events = (ObservableCollection<DayEvent>)newValue;
         }
 
         public bool GenerateEvents
@@ -138,12 +85,9 @@ namespace Calendar
             set => SetValue(FontSizeProperty, value);
         }
 
-        string[] DayNames { get; set; }
-
         public void RenderCalendar()
         {
             Debug.WriteLine("Started calendar rendering");
-            LoadMonth(ControlDate, Events);
 
             calendarGrid.Children.Clear();
             calendarGrid.RowDefinitions.Clear();
@@ -159,7 +103,7 @@ namespace Calendar
             {
                 var header = new Label
                 {
-                    Text = DayNames[i],
+                    Text = viewModel.DayNames[i],
                     FontSize = FontSize,
                     HorizontalTextAlignment = TextAlignment.Center
                 };
@@ -168,11 +112,11 @@ namespace Calendar
                 Grid.SetRow(header, 0);
             }
 
-            for (int i = 0; i < Days.Count; i++)
+            for (int i = 0; i < viewModel.Days.Count; i++)
             {
                 int row = (i + 7) / 7;
                 int col = (i + 7) % 7;
-                var day = Days[i];
+                var day = viewModel.Days[i];
                 var dayView = RenderDay(day);
 
                 calendarGrid.Children.Add(dayView);
@@ -182,7 +126,7 @@ namespace Calendar
             Debug.WriteLine("Finished calendar rendering");
         }
 
-        private View RenderDay(CalendarDay day)
+        private View RenderDay(DayViewModel day)
         {
             var label = new Label
             {
@@ -222,13 +166,10 @@ namespace Calendar
                 Padding = FontSize / 4
             };
 
-            if (OnDayTapped != null)
+            stack.GestureRecognizers.Add(new TapGestureRecognizer
             {
-                stack.GestureRecognizers.Add(new TapGestureRecognizer
-                {
-                    Command = new Command(() => OnDayTapped(day))
-                });
-            }
+                Command = new Command(() => viewModel.SetSelectedDay(day))
+            });
 
             stack.Children.Add(border);
 
@@ -260,13 +201,6 @@ namespace Calendar
             return stack;
         }
 
-        void OnDayTapped(CalendarDay tappedDay)
-        {
-            SetSelectedDay(tappedDay);
-        }
-        public ICommand NextMonth => new Command(() => ControlDate = ControlDate.AddMonths(1));
-        public ICommand PreviousMonth => new Command(() => ControlDate = ControlDate.AddMonths(-1));
-
         FlexLayout generateControls()
         {
             var layout = new FlexLayout
@@ -278,33 +212,33 @@ namespace Calendar
             var previousButton = new Button
             {
                 HorizontalOptions = LayoutOptions.End,
-                Text = "\ue901",
-                BindingContext = this,
+                Text = (string)Application.Current.Resources["ArrowLeftIcon"],
+                BindingContext = viewModel,
                 Style = (Style)Application.Current!.Resources["IconButton"],
                 HeightRequest = FontSize * 2.25,
                 WidthRequest = FontSize * 2.25
             };
-            previousButton.SetBinding(Button.CommandProperty, "PreviousMonth");
+            previousButton.SetBinding(Button.CommandProperty, nameof(viewModel.PreviousMonthCommand));
 
             var monthLabel = new Label
             {
                 HorizontalOptions = LayoutOptions.Start,
                 FontSize = FontSize * 1.5,
-                BindingContext = this
+                BindingContext = viewModel
             };
-            monthLabel.SetBinding(Label.TextProperty, new Binding("Header"));
+            monthLabel.SetBinding(Label.TextProperty, nameof(viewModel.Header));
 
             var nextButton = new Button
             {
                 HorizontalOptions = LayoutOptions.End,
-                Text = "\ue902",
-                BindingContext = this,
+                Text = (string)Application.Current.Resources["ArrowRightIcon"],
+                BindingContext = viewModel,
                 Style = (Style)Application.Current.Resources["IconButton"],
                 HeightRequest = FontSize * 2.25,
                 WidthRequest = FontSize * 2.25
 
             };
-            nextButton.SetBinding(Button.CommandProperty, "NextMonth");
+            nextButton.SetBinding(Button.CommandProperty, nameof(viewModel.NextMonthCommand));
 
             var buttons = new HorizontalStackLayout();
             buttons.Spacing = FontSize / 4;

@@ -79,5 +79,9 @@
         <Setter Property="WidthRequest" Value="36" />
     </Style>
 
-
+    <x:String x:Key="ArrowLeftIcon">&#xe901;</x:String>
+    <x:String x:Key="ArrowRightIcon">&#xe902;</x:String>
+    <x:String x:Key="PlusIcon">&#xe900;</x:String>
+    <x:String x:Key="CheckmarkIcon">&#xe903;</x:String>
+    <x:String x:Key="TrashIcon">&#xe904;</x:String>
 </ResourceDictionary>

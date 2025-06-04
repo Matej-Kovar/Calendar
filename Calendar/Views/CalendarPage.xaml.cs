@@ -1,5 +1,5 @@
-﻿using Calendar.Model;
-using Calendar.ViewModel;
+﻿using Calendar.Models;
+using Calendar.ViewModels;
 using Microsoft.Maui.Controls.Handlers.Items;
 using Microsoft.Maui.Controls.Shapes;
 using System.Collections.ObjectModel;
@@ -8,7 +8,8 @@ using System.Windows.Input;
 
 namespace Calendar
 {
-    public partial class MainPage : ContentPage, IQueryAttributable
+
+    public partial class CalendarPage : ContentPage, IQueryAttributable
     {
         CalendarView Calendar;
 
@@ -31,36 +32,32 @@ namespace Calendar
 
         public ObservableCollection<DayEvent> Events = new ObservableCollection<DayEvent>();
 
-        public MainPage()
+        public CalendarPage()
         {
             InitializeComponent();
-            /*Events.Add(new DayEvent {
-                Name = "Repeating Event",
-                Description = "This event should repeat every 3,1 days",
-                StarDate = DateTime.Now,
-                EndDate = DateTime.Now.AddMinutes(8),
-                RepeatAfter = [7],
-                Color = (Color)Application.Current.Resources["Yellow"]
 
-            });*/
             var temp = LoadEvents(path);
             foreach (DayEvent e in temp)
-            {
                 Events.Add(e);
-            }
+
             Calendar = new CalendarView
             {
-                Events = Events,
                 FontSize = 16,
                 GenerateEvents = true,
+                Events = Events,
+                SelectedDay = SelectedDay
             };
-            Calendar.SetBinding(
-                CalendarView.SelectedDayProperty,
-                new Binding(nameof(SelectedDay), source: this, mode: BindingMode.TwoWay)
-            );
+
             CalendarHolder.Children.Add(Calendar);
 
-            Calendar.RenderCalendar();
+            Calendar.ViewModel.PropertyChanged += (s, e) =>
+            {
+                if (e.PropertyName == nameof(Calendar.ViewModel.SelectedDay))
+                {
+                    SelectedDay = Calendar.SelectedDay;
+                }
+            };
+
             UpdateEventList();
         }
 
@@ -87,14 +84,12 @@ namespace Calendar
                     {
                         Events[index] = dayEvent;
                         replaced = true;
-                        //modify saved event
                     }
                 }
 
                 if (!replaced)
                 {
                     Events.Add(dayEvent);
-                    //add event to saved events
                 }
 
                 UpdateCalendar();
@@ -104,7 +99,6 @@ namespace Calendar
                 if (remove && query.TryGetValue("OriginalEvent", out var origObj) && origObj is DayEvent originalEvent)
                 {
                     Events.Remove(originalEvent);
-                    //remove event from saved events
                     UpdateCalendar();
                 }
             }
@@ -113,8 +107,8 @@ namespace Calendar
 
         public void UpdateCalendar()
         {
-            Calendar.Events = Events;
             SaveEvents(path);
+            Calendar.Events = Events;
             Calendar.RenderCalendar();
             UpdateEventList();
         }
@@ -122,34 +116,30 @@ namespace Calendar
         public void UpdateEventList()
         {
             EventDetails.Children.Clear();
-            if (Calendar is not null)
+
+            var selectedDay = Calendar.ViewModel.Days.FirstOrDefault(d => d.Date == SelectedDay.Date);
+            if (selectedDay is null)
+                return;
+
+            if (selectedDay.Events.Count == 0)
             {
-                var selectedDay = Calendar.Days.FirstOrDefault(d => d.Date == SelectedDay.Date);
-                if (selectedDay != null)
+                EventDetails.Children.Add(new Label
                 {
-                    if (selectedDay.Events.Count == 0)
+                    Text = "Na tento den není naplánovaná událost",
+                    Opacity = .5,
+                    HorizontalOptions = LayoutOptions.Center,
+                });
+            }
+            else
+            {
+                foreach (DayEvent dayEvent in selectedDay.Events)
+                {
+                    var detail = new EventDetailView(dayEvent);
+                    detail.GestureRecognizers.Add(new TapGestureRecognizer
                     {
-                        EventDetails.Children.Add(new Label
-                        {
-                            Text = "Na tento den není naplánovaná událost",
-                            Opacity = .5,
-                            //VerticalOptions = LayoutOptions.Center,
-                            HorizontalOptions = LayoutOptions.Center,
-                           
-                        });
-                    }
-                    else
-                    {
-                        foreach (DayEvent dayEvent in selectedDay.Events)
-                        {
-                            var detail = new EventDetailView(dayEvent);
-                            detail.GestureRecognizers.Add(new TapGestureRecognizer
-                            {
-                                Command = new Command(() => OnEventSelected(dayEvent))
-                            });
-                            EventDetails.Children.Add(detail);
-                        }
-                    }
+                        Command = new Command(() => OnEventSelected(dayEvent))
+                    });
+                    EventDetails.Children.Add(detail);
                 }
             }
         }

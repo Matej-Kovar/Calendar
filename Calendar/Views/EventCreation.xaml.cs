@@ -1,11 +1,11 @@
-using Calendar.Model;
+using Calendar.Models;
 using Calendar.Views;
+using Calendar.ViewModels;
 using Microsoft.Extensions.Logging;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
-using System.Security.Cryptography.X509Certificates;
 
 namespace Calendar;
 
@@ -34,6 +34,7 @@ public partial class EventCreation : ContentPage, INotifyPropertyChanged, IQuery
                 startDate = value.Date + startDate.TimeOfDay;
                 OnPropertyChanged(nameof(StartDate));
                 NewEvent[0].StarDate = StartDate;
+                RenderInput();
             }
         }
     }
@@ -52,6 +53,7 @@ public partial class EventCreation : ContentPage, INotifyPropertyChanged, IQuery
                 endDate = value.Date + endDate.TimeOfDay;
                 OnPropertyChanged(nameof(EndDate));
                 NewEvent[0].EndDate = EndDate;
+                RenderInput();
             }
         }
     }
@@ -150,7 +152,7 @@ public partial class EventCreation : ContentPage, INotifyPropertyChanged, IQuery
                 RepeatAfter = repeatPattern
             };
 
-            await Shell.Current.GoToAsync("///MainPage", new Dictionary<string, object?>
+            await Shell.Current.GoToAsync("///CalendarPage", new Dictionary<string, object?>
             {
                 { "NewEvent", newEvent },
                 { "OriginalEvent", OriginalEvent }
@@ -165,7 +167,7 @@ public partial class EventCreation : ContentPage, INotifyPropertyChanged, IQuery
 
     private async void OnBackButtonClicked(object sender, EventArgs e)
     {
-        await Shell.Current.GoToAsync("///MainPage");
+        await Shell.Current.GoToAsync("///CalendarPage");
     }
 
     private void OnInputSelected(object sender, EventArgs e)
@@ -188,14 +190,22 @@ public partial class EventCreation : ContentPage, INotifyPropertyChanged, IQuery
             case InputSelected.EndDate:
                 var calendar = new CalendarView
                 {
-                    Events = NewEvent,
                     FontSize = 14,
-                    GenerateEvents = true
+                    GenerateEvents = true,
+                    Events = NewEvent,
+                    SelectedDay = SelectedInput == InputSelected.StartDate ? StartDate : EndDate
                 };
-                calendar.SetBinding(CalendarView.SelectedDayProperty,
-                    new Binding(SelectedInput == InputSelected.StartDate ? nameof(StartDate) : nameof(EndDate), source: this, mode: BindingMode.TwoWay));
-                calendar.SetBinding(CalendarView.EventsProperty,
-                    new Binding(nameof(NewEvent), source: this, mode: BindingMode.TwoWay));
+
+                calendar.ViewModel.PropertyChanged += (s, e) =>
+                {
+                    if (e.PropertyName == nameof(CalendarViewModel.SelectedDay))
+                    {
+                        if (SelectedInput == InputSelected.StartDate)
+                            StartDate = calendar.SelectedDay;
+                        else
+                            EndDate = calendar.SelectedDay;
+                    }
+                };
                 InputSection.Children.Add(calendar);
                 break;
 
@@ -262,7 +272,7 @@ public partial class EventCreation : ContentPage, INotifyPropertyChanged, IQuery
     {
         var button = new Button
         {
-            Text = "\ue904",
+            Text = (string)Application.Current.Resources["TrashIcon"],
             Style = (Style)Application.Current.Resources["IconButton"]
         };
         button.Clicked += OnRemoveButtonClicked;
@@ -273,7 +283,7 @@ public partial class EventCreation : ContentPage, INotifyPropertyChanged, IQuery
 
     public async void OnRemoveButtonClicked(object? sender, EventArgs e)
     {
-        await Shell.Current.GoToAsync("///MainPage", new Dictionary<string, object?>
+        await Shell.Current.GoToAsync("///CalendarPage", new Dictionary<string, object?>
         {
             { "Remove?", true },
             { "OriginalEvent", OriginalEvent }

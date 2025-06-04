@@ -8,6 +8,6 @@
     Background="{DynamicResource BackgroundColor}">
 
     <ShellContent
-        ContentTemplate="{DataTemplate local:MainPage}"
-        Route="MainPage" />
+        ContentTemplate="{DataTemplate local:CalendarPage}"
+        Route="CalendarPage" />
 </Shell>

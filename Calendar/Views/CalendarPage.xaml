@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:models="clr-namespace:Calendar.Model"
              x:Name="this"
-             x:Class="Calendar.MainPage"
+             x:Class="Calendar.CalendarPage"
              Background="{DynamicResource BackgroundColor}"
              >
     <ScrollView>
@@ -11,7 +11,7 @@
             <StackLayout x:Name="CalendarHolder" Background="Transparent"></StackLayout>
             <FlexLayout JustifyContent="SpaceBetween">
                 <Label Text="Události" Style="{DynamicResource TextBig}"/>
-                <Button Text="&#xe900;" 
+                <Button Text="{StaticResource PlusIcon}" 
                         Style="{DynamicResource IconButton}"
                         Clicked="OnAddButtonClicked"/>
             </FlexLayout>

@@ -10,10 +10,10 @@
             <FlexLayout>
                 <Label Text="Událost" Style="{DynamicResource TextBig}" FlexLayout.Grow="1"/>
                 <HorizontalStackLayout Spacing="4" x:Name="Controls">
-                    <Button Text="&#xe901;"
+                    <Button Text="{StaticResource ArrowLeftIcon}"
                     Clicked="OnBackButtonClicked"
                     Style="{DynamicResource IconButton}"/>
-                    <Button Text="&#xe903;"
+                    <Button Text="{StaticResource CheckmarkIcon}"
                     Clicked="OnSubmitButtonClicked"
                     Style="{DynamicResource IconButton}"/>
                 </HorizontalStackLayout>

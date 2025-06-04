@@ -1,4 +1,4 @@
-using Calendar.Model;
+using Calendar.Models;
 
 namespace Calendar;
 
