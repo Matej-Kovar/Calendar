@@ -22,7 +22,7 @@ namespace Calendar
             Resources.MergedDictionaries.Add(new Calendar.Resources.Styles.Colors());
             Resources.MergedDictionaries.Add(new AppStyles());
 
-            if (theme == AppTheme.Dark)
+            if (/*theme == AppTheme.Dark*/false)
             {
                 Resources.MergedDictionaries.Add(new DarkColors());
             }
