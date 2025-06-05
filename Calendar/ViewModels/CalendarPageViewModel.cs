@@ -88,7 +88,7 @@ namespace Calendar.ViewModels
         public List<DayEventViewModel> LoadEvents(string path)
         {
             List<DayEventViewModel> loadedEvents = new List<DayEventViewModel>();
-            if (/*File.Exists(path)*/false)
+            if (File.Exists(path))
             {
                 string json = File.ReadAllText(path);
                 var temp = JsonSerializer.Deserialize<List<DayEvent>>(json); ;
@@ -123,7 +123,7 @@ namespace Calendar.ViewModels
         public DayEventViewModel? SelectedEvent
         {
             get { return selectedEvent; }
-            set { selectedEvent = value; NewEvent(new object(), new EventArgs()); }
+            set { selectedEvent = Events.First(e => e.Id == value.Id); NewEvent(new object(), new EventArgs()); }
         }
         public ObservableCollection<DayEventViewModel> Events { get; set; } = new ObservableCollection<DayEventViewModel>();
         public event PropertyChangedEventHandler? PropertyChanged;

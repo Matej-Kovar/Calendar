@@ -40,7 +40,7 @@ namespace Calendar.ViewModels
                 var dayModel = new DayModel
                 {
                     Date = date,
-                    Events = Events.Where(e => e.isInRange(date)).ToList()
+                    Events = Events.Select(e => e.GetEvent(date)).Where(e => e is not null).ToList()
                 };
 
                 Days.Add(new DayViewModel(dayModel)

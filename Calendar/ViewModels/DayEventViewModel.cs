@@ -14,25 +14,38 @@ namespace Calendar.ViewModels
         {
             this.Model = model;
         }
-        public bool isInRange(DateTime date)
+        public DayEventViewModel? GetEvent(DateTime date)
         {
             date = date.Date;
-            if (RepeatAfter == null || RepeatAfter.Count == 0)
+            if (RepeatAfter == null || RepeatAfter.Count == 0 || RepeatAfter.All(x => x == 0))
             {
-                return date >= StarDate.Date && date <= EndDate.Date;
+                if(date >= StarDate.Date && date <= EndDate.Date)
+                {
+                    return new DayEventViewModel(Model);
+                }
+                else
+                {
+                    return null;
+                }
             }
-
-            if (RepeatAfter.All(x => x == 0))
-                return date >= StarDate.Date && date <= EndDate.Date;
 
             DateTime baseStart = StarDate.Date;
             DateTime baseEnd = EndDate.Date;
             TimeSpan duration = baseEnd - baseStart;
 
-            int cycleLength = RepeatAfter.Sum();
+            int cycleLength = RepeatAfter.Sum() + (EndDate - StarDate).Days;
 
             if (cycleLength == 0)
-                return date >= baseStart && date <= baseEnd;
+            {
+                if (date >= StarDate.Date && date <= EndDate.Date)
+                {
+                    return new DayEventViewModel(Model);
+                }
+                else
+                {
+                    return null;
+                }
+            }
 
             int daysSinceStart = (date - baseStart).Days;
             int fullCyclesPassed = Math.Max(0, daysSinceStart / cycleLength);
@@ -45,20 +58,37 @@ namespace Calendar.ViewModels
             for (int i = 0; i < RepeatAfter.Count; i++)
             {
                 if (date >= currentStart && date <= currentEnd)
-                    return true;
-
+                {
+                    DayEvent newDayEvent = new DayEvent
+                    {
+                        EndDate = currentEnd.Date + Model.EndDate.TimeOfDay,
+                        StarDate = currentStart.Date + Model.StarDate.TimeOfDay,
+                        ColorHex = Model.ColorHex,
+                        Name = Model.Name,
+                        Description = Model.Description,
+                        Place = Model.Place,
+                        RepeatAfter = Model.RepeatAfter,
+                        Id = Id
+                    };
+                    return new DayEventViewModel(newDayEvent);
+                }
                 int offset = RepeatAfter[i];
-                currentStart = currentStart.AddDays(offset);
+                currentStart = currentEnd.AddDays(offset);
                 currentEnd = currentStart + duration;
             }
 
-            return false;
+            return null;
         }
         private void OnPropertyChanged(string name) =>
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 
         #region public properties
         public DayEvent Model { get; set; }
+
+        public Guid Id
+        {
+            get => Model.Id;
+        }
 
         public Color Color
         {

@@ -11,7 +11,7 @@ namespace Calendar;
 
 public partial class EventCreation : ContentPage, IQueryAttributable
 {
-    private EventCreationViewModel viewModel { get; }
+    public EventCreationViewModel viewModel { get; }
     public enum InputSelected { None, StartDate, EndDate, StartTime, EndTime, Color }
     public EventCreation()
     {

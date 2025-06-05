@@ -60,8 +60,4 @@ public class ColorSelectionView : ContentView
         get => (Color)GetValue(SelectedColorProperty);
         set => SetValue(SelectedColorProperty, value);
     }
-
-
-
-
 }

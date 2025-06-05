@@ -24,7 +24,7 @@ public partial class EventDetailView : ContentView
             var end = dayEvent.EndDate;
             var today = DateTime.Now.Date;
 
-            if (start.Date == end.Date)
+            if (start.Date == end.Date && start.Date == today.Date)
             {
                 return $"Dnes {start:HH\\:mm} až {end:HH\\:mm}";
             }

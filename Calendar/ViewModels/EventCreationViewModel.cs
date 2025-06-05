@@ -38,7 +38,10 @@ namespace Calendar.ViewModels
                     {
                         if (int.TryParse(s.Trim(), out var number))
                         {
-                            repeatPattern.Add(number);
+                            if(number != 0)
+                            {
+                                repeatPattern.Add(number);
+                            }
                         }
                     }
                 }
@@ -78,7 +81,7 @@ namespace Calendar.ViewModels
                 EndDate = loadedEvent.EndDate;
                 StartTime = loadedEvent.StarDate;
                 EndTime = loadedEvent.EndDate;
-                NewEvent = loadedEvent;
+                //NewEvent = loadedEvent;
                 EventDescription = loadedEvent.Description;
                 EventName = loadedEvent.Name;
                 EventPlace = loadedEvent.Place;
@@ -255,9 +258,12 @@ namespace Calendar.ViewModels
             get => color;
             set
             {
-                color = value;
-                NewEvent.Color = color;
-                OnPropertyChanged(nameof(Color));
+                if (color != value)
+                {
+                    color = value;
+                    NewEvent.Color = color;
+                    OnPropertyChanged(nameof(Color));
+                }
             }
         }
         public List<int> Repeat { get; set; } = new();

@@ -18,7 +18,7 @@ namespace Calendar.Models
             ColorHex = temp.ToArgbHex();
         }
         public DayEvent() { }
-        //public Guid Id { get; } = Guid.NewGuid();
+        public Guid Id { get; set; } = Guid.NewGuid();
         public DateTime StarDate { get; set; }
         public DateTime EndDate { get; set; }
         public string Name { get; set; }
