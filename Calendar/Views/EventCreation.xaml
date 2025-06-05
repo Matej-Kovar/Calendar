@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:Calendar"
              x:Class="Calendar.EventCreation"
              x:Name="this"
              Background="{DynamicResource BackgroundColor}"
@@ -8,7 +9,7 @@
     <ScrollView>
         <VerticalStackLayout Spacing="8" Padding="16">
             <FlexLayout>
-                <Label Text="Událost" Style="{DynamicResource TextBig}" FlexLayout.Grow="1"/>
+                <Label Text="{local:Translation NewEvent}" Style="{DynamicResource TextBig}" FlexLayout.Grow="1"/>
                 <HorizontalStackLayout Spacing="4" x:Name="Controls">
                     <Button Text="{StaticResource ArrowLeftIcon}"
                     Clicked="OnBackButtonClicked"
@@ -20,7 +21,7 @@
             </FlexLayout>
             <FlexLayout >
                 <Border Style="{DynamicResource EntryBorderPadding}" FlexLayout.Grow="1" Margin="0, 0, 4, 0" x:Name="EventNameBorder">
-                    <Entry Placeholder="Název..."
+                    <Entry Placeholder="{local:Translation EventName}"
                    x:Name="EventName"/>
                 </Border>
                 <Button Clicked="OnInputSelected" 
@@ -29,12 +30,12 @@
 
             </FlexLayout>
             <Border Style="{DynamicResource EntryBorderPadding}">
-                <Entry Placeholder="Popis..." 
+                <Entry Placeholder="{local:Translation EventDescription}" 
                x:Name="EventDescription"/>
             </Border>
             <FlexLayout Wrap="Wrap">
                 <VerticalStackLayout FlexLayout.Grow="1">
-                    <Label Text="Od"/>
+                    <Label Text="{local:Translation EventStartDate}"/>
                     <HorizontalStackLayout Spacing="4">
                         <Button Text="{Binding Source={x:Reference this}, Path=viewModel.StartDate.Date, StringFormat='{0:dd.MM.yyyy}'}"
                             Clicked="OnInputSelected" CommandParameter="StartDate"/>
@@ -43,7 +44,7 @@
                     </HorizontalStackLayout>
                 </VerticalStackLayout>
                 <VerticalStackLayout FlexLayout.Grow="1">
-                    <Label Text="Do"/>
+                    <Label Text="{local:Translation EventEndDate}"/>
                     <HorizontalStackLayout Spacing="4">
                         <Button Text="{Binding Source={x:Reference this}, Path=viewModel.EndDate.Date, StringFormat='{0:dd.MM.yyyy}'}"
                             Clicked="OnInputSelected" CommandParameter="EndDate"/>
@@ -56,10 +57,10 @@
 
             </StackLayout>
             <Border Style="{DynamicResource EntryBorderPadding}">
-                <Entry Placeholder="Místo..." x:Name="EventPlace"/>
+                <Entry Placeholder="{local:Translation EventPlace}" x:Name="EventPlace"/>
             </Border>
             <Border Style="{DynamicResource EntryBorderPadding}">
-                <Entry Placeholder="Opakovat po..." x:Name="EventRepeatAfter"/>
+                <Entry Placeholder="{local:Translation EventRepeatAfter}" x:Name="EventRepeatAfter"/>
             </Border>
         </VerticalStackLayout>
     </ScrollView>

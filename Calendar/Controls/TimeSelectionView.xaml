@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:Calendar"
              x:Class="Calendar.TimeSelectionView">
     <Grid Padding="16" 
           ColumnSpacing="8" 
@@ -18,8 +19,8 @@
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
-        <Label Text="Vyberte čas" Grid.ColumnSpan="3"/>
-        <Button Grid.ColumnSpan="3" Grid.Row="3" Text="Potvrdit" HorizontalOptions="Fill" Clicked="OnSubmitButtonClicked"/>
+        <Label Text="{local:Translation EventSelectTime}" Grid.ColumnSpan="3"/>
+        <Button Grid.ColumnSpan="3" Grid.Row="3" Text="{local:Translation Submit}" HorizontalOptions="Fill" Clicked="OnSubmitButtonClicked"/>
         <Border Style="{DynamicResource EntryBorder}" Grid.Row="1">
             <Entry 
                FontSize="24" 
@@ -39,7 +40,7 @@
                 MinimumWidthRequest="48"
                Style="{DynamicResource Time}"/>
         </Border>
-        <Label Text="Hodiny" Grid.Row="2" Grid.Column="0" HorizontalOptions="Center"/>
-        <Label Text="Minuty" Grid.Row="2" Grid.Column="3" HorizontalOptions="Center"/>
+        <Label Text="{local:Translation EventHours}" Grid.Row="2" Grid.Column="0" HorizontalOptions="Center"/>
+        <Label Text="{local:Translation EventMinutes}" Grid.Row="2" Grid.Column="3" HorizontalOptions="Center"/>
     </Grid>
 </ContentView>

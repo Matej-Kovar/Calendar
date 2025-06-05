@@ -1,4 +1,5 @@
 using Calendar.ViewModels;
+using Calendar.Resources;
 
 namespace Calendar;
 
@@ -26,19 +27,19 @@ public partial class EventDetailView : ContentView
 
             if (start.Date == end.Date && start.Date == today.Date)
             {
-                return $"Dnes {start:HH\\:mm} až {end:HH\\:mm}";
+                return $"{Strings.Today} {Strings.EventStartDate} {start:HH\\:mm} {Strings.EventEndDate} {end:HH\\:mm}";
             }
             else if (start.Date == today)
             {
-                return $"Dnes {start:HH\\:mm} až {end:dd.MM.yyyy}";
+                return $"{Strings.Today} {Strings.EventStartDate} {start:HH\\:mm} {Strings.EventEndDate} {end:dd.MM.yyyy}";
             }
             else if (end.Date == today)
             {
-                return $"{start:dd.MM.yyyy} až Dnes {end:HH\\:mm}";
+                return $"{Strings.EventStartDate} {start:dd.MM.yyyy} {Strings.EventEndDate} {Strings.Today} {end:HH\\:mm}";
             }
             else
             {
-                return $"{start:dd.MM.yyyy} až {end:dd.MM.yyyy}";
+                return $"{Strings.EventStartDate} {start:dd.MM.yyyy} {Strings.EventEndDate} {end:dd.MM.yyyy}";
             }
         }
     }

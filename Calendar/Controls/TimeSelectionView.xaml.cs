@@ -1,4 +1,4 @@
-
+using Calendar.Resources;
 namespace Calendar;
 
 public partial class TimeSelectionView : ContentView

@@ -2,6 +2,8 @@
 using Microsoft.Maui.Controls.Handlers;
 using Microsoft.Maui.Handlers;
 using Microsoft.Maui.Platform;
+using System.Globalization;
+
 
 #if ANDROID
 using Android.Graphics;
@@ -18,6 +20,8 @@ namespace Calendar
     {
         public static MauiApp CreateMauiApp()
         {
+            //CultureInfo.CurrentUICulture = new CultureInfo("en");
+            //CultureInfo.CurrentCulture = new CultureInfo("en-US");
             var builder = MauiApp.CreateBuilder();
             builder
                 .UseMauiApp<App>()

@@ -1,7 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:models="clr-namespace:Calendar.Model"
+             xmlns:models="clr-namespace:Calendar.Models"
+             xmlns:local="clr-namespace:Calendar"
              x:Name="this"
              x:Class="Calendar.CalendarPage"
              Background="{DynamicResource BackgroundColor}"
@@ -10,7 +11,7 @@
         <VerticalStackLayout Padding="24">
             <StackLayout x:Name="CalendarHolder" Background="Transparent"></StackLayout>
             <FlexLayout JustifyContent="SpaceBetween">
-                <Label Text="Události" Style="{DynamicResource TextBig}"/>
+                <Label Text="{local:Translation EventPlural}" Style="{DynamicResource TextBig}"/>
                 <Button Text="{StaticResource PlusIcon}" 
                         Style="{DynamicResource IconButton}"
                         Clicked="OnAddButtonClicked"/>

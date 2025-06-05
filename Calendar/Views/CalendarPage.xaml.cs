@@ -5,6 +5,7 @@ using Microsoft.Maui.Controls.Shapes;
 using System.Collections.ObjectModel;
 using System.Text.Json;
 using System.Windows.Input;
+using Calendar.Resources;
 
 namespace Calendar
 {
@@ -42,7 +43,7 @@ namespace Calendar
             {
                 EventDetails.Children.Add(new Label
                 {
-                    Text = "Na tento den není naplánovaná událost",
+                    Text = Strings.NoEvents,
                     Opacity = .5,
                     HorizontalOptions = LayoutOptions.Center,
                 });
