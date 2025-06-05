@@ -11,118 +11,30 @@ namespace Calendar
 
     public partial class CalendarPage : ContentPage, IQueryAttributable
     {
-        CalendarView Calendar;
-
-        string path = System.IO.Path.Combine(FileSystem.AppDataDirectory, "events.json");
-
-        DateTime selectdDay = DateTime.Now;
-        public DateTime SelectedDay
-        {
-            get {  return selectdDay; }
-            set { selectdDay = value; UpdateEventList(); }
-        }
-
-        DayEventViewModel? selectedEvent;
-
-        public DayEventViewModel? SelectedEvent
-        {
-            get { return selectedEvent; }
-            set { selectedEvent = value; OnAddButtonClicked(new object(), new EventArgs()); }
-        }
-
-        public ObservableCollection<DayEventViewModel> Events = new ObservableCollection<DayEventViewModel>();
-
+        CalendarPageViewModel viewModel;
         public CalendarPage()
         {
             InitializeComponent();
-
-            var temp = LoadEvents(path);
-            foreach (DayEventViewModel e in temp)
-                Events.Add(e);
-
-            Calendar = new CalendarView
+            viewModel = new CalendarPageViewModel();
+            CalendarHolder.Children.Add(viewModel.Calendar);
+            viewModel.PropertyChanged += (s, e) =>
             {
-                FontSize = 16,
-                GenerateEvents = true,
-                Events = Events,
-                SelectedDay = SelectedDay
-            };
-
-            CalendarHolder.Children.Add(Calendar);
-
-            Calendar.ViewModel.PropertyChanged += (s, e) =>
-            {
-                if (e.PropertyName == nameof(Calendar.ViewModel.SelectedDay))
+                if(e.PropertyName == nameof(viewModel.SelectedDay))
                 {
-                    SelectedDay = Calendar.SelectedDay;
+                    UpdateEventList();
                 }
+
             };
 
             UpdateEventList();
         }
 
-        private async void OnAddButtonClicked(object sender, EventArgs e)
-        {
-            await Shell.Current.GoToAsync(nameof(EventCreation), new Dictionary<string, object?>
-            {
-                { "SelectedDate", SelectedDay },
-                { "SelectedEvent", SelectedEvent }
-            });
-        }
-
-        protected override void OnAppearing()
-        {
-            selectedEvent = null;
-            base.OnAppearing();
-        }
-
-        public void ApplyQueryAttributes(IDictionary<string, object?> query)
-        {
-            if (query.TryGetValue("NewEvent", out var newObj) && newObj is DayEventViewModel dayEvent)
-            {
-                bool replaced = false;
-
-                if (query.TryGetValue("OriginalEvent", out var origObj) && origObj is DayEventViewModel originalEvent)
-                {
-                    int index = Events.IndexOf(originalEvent);
-                    if (index >= 0)
-                    {
-                        Events[index] = dayEvent;
-                        replaced = true;
-                    }
-                }
-
-                if (!replaced)
-                {
-                    Events.Add(dayEvent);
-                }
-
-                UpdateCalendar();
-            }
-            else if (query.TryGetValue("Remove?", out var temp) && temp is bool remove)
-            {
-                if (remove && query.TryGetValue("OriginalEvent", out var origObj) && origObj is DayEventViewModel originalEvent)
-                {
-                    Events.Remove(originalEvent);
-                    UpdateCalendar();
-                }
-            }
-                query.Clear();
-        }
-
-        public void UpdateCalendar()
-        {
-            SaveEvents(path);
-            Calendar.Events = Events;
-            Calendar.RenderCalendar();
-            UpdateEventList();
-        }
-
+        #region public methods
         public void UpdateEventList()
         {
             EventDetails.Children.Clear();
 
-            var selectedDay = Calendar.ViewModel.Days.FirstOrDefault(d => d.Date == SelectedDay.Date);
+            var selectedDay = viewModel.Calendar.ViewModel.Days.FirstOrDefault(d => d.Date == viewModel.SelectedDay.Date);
             if (selectedDay is null)
                 return;
 
@@ -148,34 +60,25 @@ namespace Calendar
                 }
             }
         }
-
+        public void ApplyQueryAttributes(IDictionary<string, object?> query)
+        {
+            viewModel.ApplyQueryAttributes(query);
+            UpdateEventList();
+        }
         public void OnEventSelected(DayEventViewModel selectedEvent)
         {
-            SelectedEvent = selectedEvent;
+            viewModel.SelectedEvent = selectedEvent;
         }
-
-        public List<DayEventViewModel> LoadEvents(string path)
+        public void OnAddButtonClicked(object sender, EventArgs e)
         {
-            List<DayEventViewModel> loadedEvents = new List<DayEventViewModel>();
-            if(File.Exists(path))
-            {
-                string json = File.ReadAllText(path);
-                var temp = JsonSerializer.Deserialize<List<DayEvent>>(json);;
-                if(temp != null)
-                {
-                    foreach(var dayEvent in temp)
-                    {
-                        loadedEvents.Add(new DayEventViewModel(dayEvent));
-                    }
-                }
-            }
-            return loadedEvents;
+            viewModel.NewEvent(sender, e);
         }
+#endregion
 
-        public void SaveEvents(string path)
+        protected override void OnAppearing()
         {
-            var json = JsonSerializer.Serialize(Events.Select(e => e.Model).ToList()/*, new JsonSerializerOptions { WriteIndented = true }*/);
-            File.WriteAllTextAsync(path, json);
+            viewModel.selectedEvent = null;
+            base.OnAppearing();
         }
     }
 }

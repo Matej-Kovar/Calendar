@@ -11,16 +11,21 @@ namespace Calendar.ViewModels
     public class DayViewModel : INotifyPropertyChanged
     {
         private readonly DayModel model;
-
-        public DateTime Date => model.Date;
-        public List<DayEventViewModel> Events => model.Events;
+        private bool isSelected;
+        private bool isToday;
 
         public DayViewModel(DayModel model)
         {
             this.model = model;
         }
 
-        private bool isSelected;
+        private void OnPropertyChanged(string name) =>
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+
+        public DateTime Date => model.Date;
+        public List<DayEventViewModel> Events => model.Events;
+
+        #region public properties
         public bool IsSelected
         {
             get => isSelected;
@@ -36,7 +41,6 @@ namespace Calendar.ViewModels
             }
         }
 
-        private bool isToday;
         public bool IsToday
         {
             get => isToday;
@@ -64,7 +68,6 @@ namespace Calendar.ViewModels
         public double StrokeThickness => IsSelected ? 3 : 1;
 
         public event PropertyChangedEventHandler? PropertyChanged;
-        private void OnPropertyChanged(string name) =>
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        #endregion
     }
 }

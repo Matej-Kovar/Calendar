@@ -9,7 +9,6 @@ namespace Calendar.Models
 {
     public class DayEvent
     {
-        public DayEvent() { }
         public DayEvent(DateTime starDate, DateTime endTime, string name)
         {
             StarDate = starDate;
@@ -18,7 +17,7 @@ namespace Calendar.Models
             Color temp = (Color)Application.Current.Resources["PrimaryColor"];
             ColorHex = temp.ToArgbHex();
         }
-
+        public DayEvent() { }
         //public Guid Id { get; } = Guid.NewGuid();
         public DateTime StarDate { get; set; }
         public DateTime EndDate { get; set; }

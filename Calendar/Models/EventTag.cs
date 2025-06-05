@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Calendar.Modelss
+namespace Calendar.Models
 {
     public class EventTag
     {

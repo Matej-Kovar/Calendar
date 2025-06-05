@@ -14,6 +14,46 @@ public class ColorSelectionView : ContentView
         typeof(ColorSelectionView),
         Colors.Transparent,
 		BindingMode.TwoWay);
+    public ColorSelectionView(List<Color> colors)
+    {
+        this.colors = colors;
+        Content = flex;
+        RenderColorSelection();
+    }
+
+    public void RenderColorSelection()
+    {
+        flex.Children.Clear();
+        flex.Wrap = Microsoft.Maui.Layouts.FlexWrap.Wrap;
+        flex.Padding = 8;
+        flex.HorizontalOptions = LayoutOptions.Center;
+        flex.VerticalOptions = LayoutOptions.Center;
+        foreach (var color in colors)
+        {
+            var rect = new Rectangle
+            {
+                Fill = color,
+                HeightRequest = 48,
+                WidthRequest = 48,
+                Stroke = SelectedColor == color ? (Color)Application.Current.Resources["TextColor"] : Colors.Transparent,
+                StrokeThickness = 4,
+                RadiusX = 8,
+                RadiusY = 8,
+                Margin = 1
+            };
+            rect.GestureRecognizers.Add(new TapGestureRecognizer
+            {
+                Command = new Command(() => OnColorChanged(rect.Fill))
+            });
+            flex.Children.Add(rect);
+        }
+    }
+    public void OnColorChanged(Brush brush)
+    {
+        var temp = (SolidColorBrush)brush;
+        SelectedColor = temp.Color;
+        RenderColorSelection();
+    }
 
     public Color SelectedColor
     {
@@ -21,45 +61,7 @@ public class ColorSelectionView : ContentView
         set => SetValue(SelectedColorProperty, value);
     }
 
-    public ColorSelectionView(List<Color> colors)
-	{
-		this.colors = colors;
-		Content = flex;
-		RenderColorSelection();
-	}
 
-	public void RenderColorSelection()
-	{
-        flex.Children.Clear();
-		flex.Wrap = Microsoft.Maui.Layouts.FlexWrap.Wrap;
-		flex.Padding = 8;
-		flex.HorizontalOptions = LayoutOptions.Center;
-		flex.VerticalOptions = LayoutOptions.Center;
-		foreach (var color in colors)
-		{
-			var rect = new Rectangle
-			{
-				Fill = color,
-				HeightRequest = 48,
-				WidthRequest = 48,
-				Stroke = SelectedColor == color ? (Color)Application.Current.Resources["TextColor"] : Colors.Transparent,
-				StrokeThickness = 4,
-				RadiusX = 8,
-				RadiusY = 8,
-				Margin = 1
-			};
-			rect.GestureRecognizers.Add(new TapGestureRecognizer
-			{
-                Command = new Command(() => OnColorChanged(rect.Fill))
-            });
-			flex.Children.Add(rect);
-		}
-    }
 
-	public void OnColorChanged(Brush brush)
-	{
-		var temp = (SolidColorBrush)brush;
-		SelectedColor = temp.Color;
-		RenderColorSelection();
-	}
+
 }

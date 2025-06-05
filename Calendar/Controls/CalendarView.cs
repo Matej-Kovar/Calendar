@@ -13,29 +13,17 @@ namespace Calendar
 {
     public partial class CalendarView : ContentView
     {
-        private readonly Grid calendarGrid = new();
+        readonly Grid calendarGrid = new();
 
         VerticalStackLayout verticalStackLayout = new();
 
-        private CalendarViewModel viewModel = new();
-        public CalendarViewModel ViewModel => viewModel;
+        CalendarViewModel viewModel = new();
 
-        public ObservableCollection<DayEventViewModel> Events
-        {
-            get => ViewModel.Events;
-            set
-            {
-                ViewModel.Events = value;
-                ViewModel.LoadMonth();
-                Dispatcher.Dispatch(() => RenderCalendar());
-            }
-        }
+        public static readonly BindableProperty GenerateEventsProperty =
+            BindableProperty.Create(nameof(GenerateEvents), typeof(bool), typeof(CalendarView), true);
 
-        public DateTime SelectedDay
-        {
-            get => ViewModel.SelectedDay;
-            set { ViewModel.SelectedDay = value; viewModel.LoadMonth(); }
-        }
+        public static readonly BindableProperty FontSizeProperty =
+            BindableProperty.Create(nameof(FontSize), typeof(double), typeof(CalendarView), 16.0);
         public CalendarView()
         {
             BindingContext = viewModel;
@@ -53,36 +41,6 @@ namespace Calendar
                 }
             };
             //Dispatcher.Dispatch(() => RenderCalendar());
-        }
-
-        public static readonly BindableProperty GenerateEventsProperty =
-            BindableProperty.Create(nameof(GenerateEvents), typeof(bool), typeof(CalendarView), true);
-
-        public static readonly BindableProperty FontSizeProperty =
-            BindableProperty.Create(nameof(FontSize), typeof(double), typeof(CalendarView), 16.0);
-
-        private static void OnSelectedDayChanged(BindableObject bindable, object oldValue, object newValue)
-        {
-            var calendar = (CalendarView)bindable;
-            calendar.viewModel.ControlDate = calendar.viewModel.SelectedDay.Date;
-        }
-
-        private static void OnEventsChanged(BindableObject bindable, object oldValue, object newValue)
-        {
-            var calendar = (CalendarView)bindable;
-            calendar.Events = (ObservableCollection<DayEventViewModel>)newValue;
-        }
-
-        public bool GenerateEvents
-        {
-            get => (bool)GetValue(GenerateEventsProperty);
-            set => SetValue(GenerateEventsProperty, value);
-        }
-
-        public double FontSize
-        {
-            get => (double)GetValue(FontSizeProperty);
-            set => SetValue(FontSizeProperty, value);
         }
 
         public void RenderCalendar()
@@ -126,7 +84,19 @@ namespace Calendar
             Debug.WriteLine("Finished calendar rendering");
         }
 
-        private View RenderDay(DayViewModel day)
+        private static void OnSelectedDayChanged(BindableObject bindable, object oldValue, object newValue)
+        {
+            var calendar = (CalendarView)bindable;
+            calendar.viewModel.ControlDate = calendar.viewModel.SelectedDay.Date;
+        }
+
+        private static void OnEventsChanged(BindableObject bindable, object oldValue, object newValue)
+        {
+            var calendar = (CalendarView)bindable;
+            calendar.Events = (ObservableCollection<DayEventViewModel>)newValue;
+        }
+
+        View RenderDay(DayViewModel day)
         {
             var label = new Label
             {
@@ -251,6 +221,35 @@ namespace Calendar
             return layout;
         }
 
+        public CalendarViewModel ViewModel => viewModel;
 
+        public ObservableCollection<DayEventViewModel> Events
+        {
+            get => ViewModel.Events;
+            set
+            {
+                ViewModel.Events = value;
+                ViewModel.LoadMonth();
+                Dispatcher.Dispatch(() => RenderCalendar());
+            }
+        }
+
+        public DateTime SelectedDay
+        {
+            get => ViewModel.SelectedDay;
+            set { ViewModel.SelectedDay = value; viewModel.LoadMonth(); }
+        }
+
+        public bool GenerateEvents
+        {
+            get => (bool)GetValue(GenerateEventsProperty);
+            set => SetValue(GenerateEventsProperty, value);
+        }
+
+        public double FontSize
+        {
+            get => (double)GetValue(FontSizeProperty);
+            set => SetValue(FontSizeProperty, value);
+        }
     }
 }

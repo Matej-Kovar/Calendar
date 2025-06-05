@@ -11,10 +11,8 @@ namespace Calendar;
 
 public partial class EventCreation : ContentPage, IQueryAttributable
 {
-    public EventCreationViewModel viewModel { get; }
+    private EventCreationViewModel viewModel { get; }
     public enum InputSelected { None, StartDate, EndDate, StartTime, EndTime, Color }
-    public InputSelected SelectedInput { get; set; } = InputSelected.None;
-
     public EventCreation()
     {
         viewModel = new EventCreationViewModel();
@@ -26,7 +24,7 @@ public partial class EventCreation : ContentPage, IQueryAttributable
         EventRepeatAfter.SetBinding(Entry.TextProperty, new Binding(nameof(viewModel.EventRepeatAfter), source: viewModel, mode: BindingMode.TwoWay));
         viewModel.PropertyChanged += (s, e) =>
         {
-            if(e.PropertyName == nameof(viewModel.IsModifying) && viewModel.IsModifying)
+            if (e.PropertyName == nameof(viewModel.IsModifying) && viewModel.IsModifying)
             {
                 CreateTrashButton();
             }
@@ -41,6 +39,8 @@ public partial class EventCreation : ContentPage, IQueryAttributable
         };
         RenderInput();
     }
+
+    #region public methods
     public void RenderInput()
     {
         InputSection.Children.Clear();
@@ -87,7 +87,7 @@ public partial class EventCreation : ContentPage, IQueryAttributable
             case InputSelected.Color:
                 var colorSelector = new ColorSelectionView(viewModel.Colors);
                 colorSelector.SetBinding(ColorSelectionView.SelectedColorProperty,
-                    new Binding(nameof(viewModel.Colors), source: viewModel, mode: BindingMode.TwoWay));
+                    new Binding(nameof(viewModel.Color), source: viewModel, mode: BindingMode.TwoWay));
                 InputSection.Children.Add(colorSelector);
                 break;
         }
@@ -139,6 +139,9 @@ public partial class EventCreation : ContentPage, IQueryAttributable
 
     public void ApplyQueryAttributes(IDictionary<string, object> query)
     {
-       viewModel.ApplyQueryAttributes(query);
+        viewModel.ApplyQueryAttributes(query);
     }
+    #endregion
+
+    public InputSelected SelectedInput { get; set; } = InputSelected.None;
 }

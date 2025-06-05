@@ -3,6 +3,9 @@ namespace Calendar;
 
 public partial class TimeSelectionView : ContentView
 {
+    bool updating = false;
+    DateTime TempSelectedTime;
+
     public static readonly BindableProperty SelectedTimeProperty =
     BindableProperty.Create(
     nameof(SelectedTime),
@@ -11,25 +14,16 @@ public partial class TimeSelectionView : ContentView
     DateTime.Now,
     BindingMode.TwoWay
     );
-    public DateTime SelectedTime
-    {
-        get => (DateTime)GetValue(SelectedTimeProperty);
-        set => SetValue(SelectedTimeProperty, value);
-    }
-
-    bool updating = false;
-
-    DateTime TempSelectedTime;
 
     public TimeSelectionView(DateTime defaultTime)
-	{
-		InitializeComponent();
+    {
+        InitializeComponent();
         TempSelectedTime = defaultTime;
         string hours = TempSelectedTime.Hour.ToString();
         string minutes = TempSelectedTime.Minute.ToString();
         HoursEntry.Placeholder = hours.Length == 1 ? "0" + hours : hours;
         MinutesEntry.Placeholder = minutes.Length == 1 ? "0" + minutes : minutes;
-	}
+    }
     private void HoursEntry_TextChanged(object sender, TextChangedEventArgs e)
     {
         if (!updating)
@@ -95,5 +89,11 @@ public partial class TimeSelectionView : ContentView
         }
 
         return "00";
+    }
+
+    public DateTime SelectedTime
+    {
+        get => (DateTime)GetValue(SelectedTimeProperty);
+        set => SetValue(SelectedTimeProperty, value);
     }
 }

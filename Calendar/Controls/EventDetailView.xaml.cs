@@ -4,7 +4,17 @@ namespace Calendar;
 
 public partial class EventDetailView : ContentView
 {
-	public DayEventViewModel dayEvent { get; set; }
+    public EventDetailView(DayEventViewModel dayEvent)
+    {
+        this.dayEvent = dayEvent;
+        InitializeComponent();
+        if (dayEvent.Description == null || dayEvent.Description == string.Empty)
+        {
+            DescriptionLabel.HeightRequest = 0;
+        }
+
+    }
+    public DayEventViewModel dayEvent { get; set; }
 
     public string TimeRange
     {
@@ -32,14 +42,5 @@ public partial class EventDetailView : ContentView
             }
         }
     }
-    public EventDetailView(DayEventViewModel dayEvent)
-	{
-		this.dayEvent = dayEvent;
-        InitializeComponent();
-        if (dayEvent.Description == null || dayEvent.Description == string.Empty)
-        {
-            DescriptionLabel.HeightRequest = 0;
-        }
-		
-	}
+
 }

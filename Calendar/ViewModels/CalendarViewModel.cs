@@ -15,46 +15,6 @@ namespace Calendar.ViewModels
         private DateTime controlDate = DateTime.Now;
         private DateTime selectedDay = DateTime.Now;
 
-        public DateTime ControlDate
-        {
-            get => controlDate;
-            set
-            {
-                if (controlDate.Month != value.Month)
-                {
-                    controlDate = value;
-                    OnPropertyChanged();
-                    OnPropertyChanged(nameof(Header));
-                    LoadMonth();
-                }
-            }
-        }
-
-        public DateTime SelectedDay
-        {
-            get => selectedDay;
-            set
-            {
-                if (selectedDay != value)
-                {
-                    selectedDay = value;
-                    OnPropertyChanged();
-                    ControlDate = selectedDay;
-                }
-            }
-        }
-
-        public string Header => CultureInfo.CurrentCulture.TextInfo.ToTitleCase(ControlDate.ToString("MMMM yyyy"));
-
-        public ObservableCollection<DayViewModel> Days { get; set; } = new();
-
-        public ObservableCollection<DayEventViewModel> Events { get; set; } = new();
-
-        public string[] DayNames { get; } = DateTimeFormatInfo.CurrentInfo.DayNames.Select(n => n.Substring(0, 3).ToUpper()).ToArray();
-
-        public ICommand NextMonthCommand { get; }
-        public ICommand PreviousMonthCommand { get; }
-
         public CalendarViewModel()
         {
             NextMonthCommand = new Command(() => ControlDate = ControlDate.AddMonths(1));
@@ -62,6 +22,7 @@ namespace Calendar.ViewModels
             LoadMonth();
         }
 
+        #region public methods
         public void LoadMonth()
         {
             var month = ControlDate;
@@ -100,10 +61,53 @@ namespace Calendar.ViewModels
 
             SelectedDay = tappedDay.Date;
         }
-
-        public event PropertyChangedEventHandler PropertyChanged;
+        #endregion
 
         private void OnPropertyChanged([CallerMemberName] string name = "") =>
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+
+        public ICommand NextMonthCommand { get; }
+        public ICommand PreviousMonthCommand { get; }
+
+        #region public properties
+        public DateTime ControlDate
+        {
+            get => controlDate;
+            set
+            {
+                if (controlDate.Month != value.Month)
+                {
+                    controlDate = value;
+                    OnPropertyChanged();
+                    OnPropertyChanged(nameof(Header));
+                    LoadMonth();
+                }
+            }
+        }
+
+        public DateTime SelectedDay
+        {
+            get => selectedDay;
+            set
+            {
+                if (selectedDay != value)
+                {
+                    selectedDay = value;
+                    OnPropertyChanged();
+                    ControlDate = selectedDay;
+                }
+            }
+        }
+
+        public string Header => CultureInfo.CurrentCulture.TextInfo.ToTitleCase(ControlDate.ToString("MMMM yyyy"));
+
+        public ObservableCollection<DayViewModel> Days { get; set; } = new();
+
+        public ObservableCollection<DayEventViewModel> Events { get; set; } = new();
+
+        public string[] DayNames { get; } = DateTimeFormatInfo.CurrentInfo.DayNames.Select(n => n.Substring(0, 3).ToUpper()).ToArray();
+        
+        public event PropertyChangedEventHandler PropertyChanged;
+        #endregion
     }
 }

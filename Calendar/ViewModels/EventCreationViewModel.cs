@@ -7,181 +7,262 @@ using System.ComponentModel;
 using System.Windows.Input;
 using static Calendar.EventCreation;
 
-namespace Calendar.ViewModels;
-
-public class EventCreationViewModel : INotifyPropertyChanged
+namespace Calendar.ViewModels
 {
-    public event PropertyChangedEventHandler? PropertyChanged;
-
-    public DayEventViewModel? OriginalEvent { get; set; }
-
-    public DayEventViewModel NewEvent { get; set; } = new DayEventViewModel(new DayEvent(DateTime.Now, DateTime.Now, ""));
-
-    private DateTime startDate = DateTime.Now;
-    public DateTime StartDate
+    public class EventCreationViewModel : INotifyPropertyChanged
     {
-        get => startDate;
-        set
-        {
-            if (startDate.Date != value.Date)
-            {
-                if (value.Date > EndDate.Date)
-                    EndDate = value;
+        #region private variables
+        private DateTime startDate = DateTime.Now;
+        private DateTime endDate = DateTime.Now;
+        private bool isDataValid = true;
+        private bool isModifying = false;
+        private string eventName = string.Empty;
+        private string eventDescription = string.Empty;
+        private string eventPlace = string.Empty;
+        private string eventRepeatAfter = string.Empty;
+        private Color color = (Color)Application.Current.Resources["Blue"];
+        #endregion
 
-                startDate = value.Date + startDate.TimeOfDay;
-                OnPropertyChanged(nameof(StartDate));
-                NewEvent.StarDate = StartDate;
+        #region public methods
+        public async void CreateNewEvent()
+        {
+            if (!string.IsNullOrWhiteSpace(EventName))
+            {
+                IsDataValid = true;
+                List<int> repeatPattern = new List<int>();
+                var temp0 = EventRepeatAfter;
+                if (temp0 != null)
+                {
+                    string[] temp = temp0.Split(',');
+                    foreach (string s in temp)
+                    {
+                        if (int.TryParse(s.Trim(), out var number))
+                        {
+                            repeatPattern.Add(number);
+                        }
+                    }
+                }
+                var newEvent = new DayEventViewModel(new DayEvent(StartDate, EndDate, EventName))
+                {
+                    Place = EventPlace,
+                    Description = EventDescription,
+                    Color = Color,
+                    RepeatAfter = repeatPattern
+                };
+
+                await Shell.Current.GoToAsync("///CalendarPage", new Dictionary<string, object?>
+            {
+                { "NewEvent", newEvent },
+                { "OriginalEvent", OriginalEvent }
+            });
+            }
+            else
+            {
+                IsDataValid = false;
             }
         }
-    }
-
-    private DateTime endDate = DateTime.Now;
-    public DateTime EndDate
-    {
-        get => endDate;
-        set
+        public void ApplyQueryAttributes(IDictionary<string, object> query)
         {
-            if (endDate.Date != value.Date)
+            IsModifying = false;
+            if (query.TryGetValue("SelectedDate", out var selectedDate))
             {
-                if (value.Date < StartDate.Date)
-                    StartDate = value;
+                StartDate = (DateTime)selectedDate;
+                EndDate = StartDate;
+            }
 
-                endDate = value.Date + endDate.TimeOfDay;
-                OnPropertyChanged(nameof(EndDate));
-                NewEvent.EndDate = EndDate;
+            if (query.TryGetValue("SelectedEvent", out var selectedEvent) && selectedEvent is DayEventViewModel loadedEvent)
+            {
+                OriginalEvent = loadedEvent;
+                Color = loadedEvent.Color;
+                StartDate = loadedEvent.StarDate;
+                EndDate = loadedEvent.EndDate;
+                StartTime = loadedEvent.StarDate;
+                EndTime = loadedEvent.EndDate;
+                NewEvent = loadedEvent;
+                EventDescription = loadedEvent.Description;
+                EventName = loadedEvent.Name;
+                EventPlace = loadedEvent.Place;
+                string temp = string.Empty;
+                foreach (int i in loadedEvent.RepeatAfter)
+                {
+                    temp += i.ToString() + ", ";
+                }
+                if (temp.Length > 2)
+                {
+                    temp = temp.Remove(temp.Length - 2);
+                }
+                EventRepeatAfter = temp;
+                IsModifying = true;
+            }
+            query.Clear();
+        }
+        public async void NavigateBack()
+        {
+            await Shell.Current.GoToAsync("///CalendarPage");
+        }
+        public async void RemoveEvent()
+        {
+            await Shell.Current.GoToAsync("///CalendarPage", new Dictionary<string, object?>
+        {
+            { "Remove?", true },
+            { "OriginalEvent", OriginalEvent }
+        });
+        }
+        #endregion
+        private void OnPropertyChanged(string name) =>
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+
+        #region public properties
+        public event PropertyChangedEventHandler? PropertyChanged;
+        public DayEventViewModel? OriginalEvent { get; set; }
+        public DayEventViewModel NewEvent { get; set; } = new DayEventViewModel(new DayEvent(DateTime.Now, DateTime.Now, ""));
+        public DateTime StartDate
+        {
+            get => startDate;
+            set
+            {
+                if (startDate.Date != value.Date)
+                {
+                    if (value.Date > EndDate.Date)
+                        EndDate = value;
+
+                    startDate = value.Date + startDate.TimeOfDay;
+                    OnPropertyChanged(nameof(StartDate));
+                    NewEvent.StarDate = StartDate;
+                }
             }
         }
-    }
-
-    public DateTime StartTime
-    {
-        get => startDate;
-        set
+        public DateTime EndDate
         {
-            if (startDate.TimeOfDay != value.TimeOfDay)
+            get => endDate;
+            set
             {
-                if ((startDate.Date + value.TimeOfDay) > EndDate)
-                    EndTime = value;
+                if (endDate.Date != value.Date)
+                {
+                    if (value.Date < StartDate.Date)
+                        StartDate = value;
 
-                startDate = startDate.Date + value.TimeOfDay;
-                OnPropertyChanged(nameof(StartTime));
-                NewEvent.StarDate = StartDate;
+                    endDate = value.Date + endDate.TimeOfDay;
+                    OnPropertyChanged(nameof(EndDate));
+                    NewEvent.EndDate = EndDate;
+                }
             }
         }
-    }
-
-    public DateTime EndTime
-    {
-        get => endDate;
-        set
+        public DateTime StartTime
         {
-            if (endDate.TimeOfDay != value.TimeOfDay)
+            get => startDate;
+            set
             {
-                if ((endDate.Date + value.TimeOfDay) < StartDate)
-                    StartTime = value;
+                if (startDate.TimeOfDay != value.TimeOfDay)
+                {
+                    if ((startDate.Date + value.TimeOfDay) > EndDate)
+                        EndTime = value;
 
-                endDate = endDate.Date + value.TimeOfDay;
-                OnPropertyChanged(nameof(EndTime));
-                NewEvent.EndDate = EndDate;
+                    startDate = startDate.Date + value.TimeOfDay;
+                    OnPropertyChanged(nameof(StartTime));
+                    NewEvent.StarDate = StartDate;
+                }
             }
         }
-    }
-    private bool isDataValid = true;
-    public bool IsDataValid
-    {
-        get => isDataValid;
-        set
+        public DateTime EndTime
         {
-            if (isDataValid != value)
+            get => endDate;
+            set
             {
-                isDataValid = value;
-                OnPropertyChanged(nameof(IsDataValid));
+                if (endDate.TimeOfDay != value.TimeOfDay)
+                {
+                    if ((endDate.Date + value.TimeOfDay) < StartDate)
+                        StartTime = value;
+
+                    endDate = endDate.Date + value.TimeOfDay;
+                    OnPropertyChanged(nameof(EndTime));
+                    NewEvent.EndDate = EndDate;
+                }
             }
         }
-    }
-
-    private bool isModifying = false;
-    public bool IsModifying
-    {
-        get => isModifying;
-        set
+        public bool IsDataValid
         {
-           isModifying = value;
-           OnPropertyChanged(nameof(IsModifying));
-           
-        }
-    }
-
-    private string eventName = string.Empty;
-    public string EventName
-    {
-        get => eventName;
-        set
-        {
-            if (eventName != value)
+            get => isDataValid;
+            set
             {
-                eventName = value;
-                OnPropertyChanged(nameof(EventName));
+                if (isDataValid != value)
+                {
+                    isDataValid = value;
+                    OnPropertyChanged(nameof(IsDataValid));
+                }
             }
         }
-    }
-
-    private string eventDescription = string.Empty;
-    public string EventDescription
-    {
-        get => eventDescription;
-        set
+        public bool IsModifying
         {
-            if (eventDescription != value)
+            get => isModifying;
+            set
             {
-                eventDescription = value;
-                OnPropertyChanged(nameof(EventDescription));
+                isModifying = value;
+                OnPropertyChanged(nameof(IsModifying));
+
             }
         }
-    }
-
-    private string eventPlace = string.Empty;
-    public string EventPlace
-    {
-        get => eventPlace;
-        set
+        public string EventName
         {
-            if (eventPlace != value)
+            get => eventName;
+            set
             {
-                eventPlace = value;
-                OnPropertyChanged(nameof(EventPlace));
+                if (eventName != value)
+                {
+                    eventName = value;
+                    OnPropertyChanged(nameof(EventName));
+                }
             }
         }
-    }
-
-    private string eventRepeatAfter = string.Empty;
-    public string EventRepeatAfter
-    {
-        get => eventRepeatAfter;
-        set
+        public string EventDescription
         {
-            if (eventRepeatAfter != value)
+            get => eventDescription;
+            set
             {
-                eventRepeatAfter = value;
-                OnPropertyChanged(nameof(EventRepeatAfter));
+                if (eventDescription != value)
+                {
+                    eventDescription = value;
+                    OnPropertyChanged(nameof(EventDescription));
+                }
             }
         }
-    }
-
-    private Color color = (Color)Application.Current.Resources["Blue"];
-    public Color Color
-    {
-        get => color;
-        set
+        public string EventPlace
         {
-            color = value;
-            NewEvent.Color = color;
-            OnPropertyChanged(nameof(Color));
+            get => eventPlace;
+            set
+            {
+                if (eventPlace != value)
+                {
+                    eventPlace = value;
+                    OnPropertyChanged(nameof(EventPlace));
+                }
+            }
         }
-    }
-    public List<int> Repeat { get; set; } = new();
+        public string EventRepeatAfter
+        {
+            get => eventRepeatAfter;
+            set
+            {
+                if (eventRepeatAfter != value)
+                {
+                    eventRepeatAfter = value;
+                    OnPropertyChanged(nameof(EventRepeatAfter));
+                }
+            }
+        }
+        public Color Color
+        {
+            get => color;
+            set
+            {
+                color = value;
+                NewEvent.Color = color;
+                OnPropertyChanged(nameof(Color));
+            }
+        }
+        public List<int> Repeat { get; set; } = new();
 
-    public readonly List<Color> Colors = new()
+        public readonly List<Color> Colors = new()
     {
         (Color)Application.Current.Resources["Yellow"],
         (Color)Application.Current.Resources["Orange"],
@@ -190,91 +271,6 @@ public class EventCreationViewModel : INotifyPropertyChanged
         (Color)Application.Current.Resources["Purple"],
         (Color)Application.Current.Resources["Blue"]
     };
-
-    public async void CreateNewEvent()
-    {
-        if (!string.IsNullOrWhiteSpace(EventName))
-        {
-            IsDataValid = true;
-            List<int> repeatPattern = new List<int>();
-            var temp0 = EventRepeatAfter;
-            if (temp0 != null)
-            {
-                string[] temp = temp0.Split(',');
-                foreach (string s in temp)
-                {
-                    if (int.TryParse(s.Trim(), out var number))
-                    {
-                        repeatPattern.Add(number);
-                    }
-                }
-            }
-            var newEvent = new DayEventViewModel(new DayEvent(StartDate, EndDate, EventName))
-            {
-                Place = EventPlace,
-                Description = EventDescription,
-                Color = Color,
-                RepeatAfter = repeatPattern
-            };
-
-            await Shell.Current.GoToAsync("///CalendarPage", new Dictionary<string, object?>
-            {
-                { "NewEvent", newEvent },
-                { "OriginalEvent", OriginalEvent }
-            });
-        }
-        else
-        {
-            IsDataValid = false;
-        }
+        #endregion
     }
-    public void ApplyQueryAttributes(IDictionary<string, object> query)
-    {
-        IsModifying = false;
-        if (query.TryGetValue("SelectedDate", out var selectedDate))
-        {
-            StartDate = (DateTime)selectedDate;
-            EndDate = StartDate;
-        }
-
-        if (query.TryGetValue("SelectedEvent", out var selectedEvent) && selectedEvent is DayEventViewModel loadedEvent)
-        {
-            OriginalEvent = loadedEvent;
-            Color = loadedEvent.Color;
-            StartDate = loadedEvent.StarDate;
-            EndDate = loadedEvent.EndDate;
-            StartTime = loadedEvent.StarDate;
-            EndTime = loadedEvent.EndDate;
-            NewEvent = loadedEvent;
-            EventDescription = loadedEvent.Description;
-            EventName = loadedEvent.Name;
-            EventPlace = loadedEvent.Place;
-            string temp = string.Empty;
-            foreach (int i in loadedEvent.RepeatAfter)
-            {
-                temp += i.ToString() + ", ";
-            }
-            if (temp.Length > 2)
-            {
-                temp = temp.Remove(temp.Length - 2);
-            }
-            EventRepeatAfter = temp;
-            IsModifying = true;
-        }
-        query.Clear();
-    }
-    public async void NavigateBack()
-    {
-        await Shell.Current.GoToAsync("///CalendarPage");
-    }
-    public async void RemoveEvent()
-    {
-        await Shell.Current.GoToAsync("///CalendarPage", new Dictionary<string, object?>
-        {
-            { "Remove?", true },
-            { "OriginalEvent", OriginalEvent }
-        });
-    }
-    private void OnPropertyChanged(string name) =>
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 }

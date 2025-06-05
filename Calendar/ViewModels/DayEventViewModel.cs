@@ -10,12 +10,55 @@ namespace Calendar.ViewModels
 {
     public class DayEventViewModel: INotifyPropertyChanged
     {
-        public DayEvent Model { get; set; }
-
         public DayEventViewModel(DayEvent model)
         {
             this.Model = model;
         }
+        public bool isInRange(DateTime date)
+        {
+            date = date.Date;
+            if (RepeatAfter == null || RepeatAfter.Count == 0)
+            {
+                return date >= StarDate.Date && date <= EndDate.Date;
+            }
+
+            if (RepeatAfter.All(x => x == 0))
+                return date >= StarDate.Date && date <= EndDate.Date;
+
+            DateTime baseStart = StarDate.Date;
+            DateTime baseEnd = EndDate.Date;
+            TimeSpan duration = baseEnd - baseStart;
+
+            int cycleLength = RepeatAfter.Sum();
+
+            if (cycleLength == 0)
+                return date >= baseStart && date <= baseEnd;
+
+            int daysSinceStart = (date - baseStart).Days;
+            int fullCyclesPassed = Math.Max(0, daysSinceStart / cycleLength);
+
+            DateTime cycleStart = baseStart.AddDays(fullCyclesPassed * cycleLength);
+
+            DateTime currentStart = cycleStart;
+            DateTime currentEnd = currentStart + duration;
+
+            for (int i = 0; i < RepeatAfter.Count; i++)
+            {
+                if (date >= currentStart && date <= currentEnd)
+                    return true;
+
+                int offset = RepeatAfter[i];
+                currentStart = currentStart.AddDays(offset);
+                currentEnd = currentStart + duration;
+            }
+
+            return false;
+        }
+        private void OnPropertyChanged(string name) =>
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+
+        #region public properties
+        public DayEvent Model { get; set; }
 
         public Color Color
         {
@@ -82,50 +125,6 @@ namespace Calendar.ViewModels
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;
-
-        public bool isInRange(DateTime date)
-        {
-            date = date.Date;
-            if (RepeatAfter == null || RepeatAfter.Count == 0)
-            {
-                return date >= StarDate.Date && date <= EndDate.Date;
-            }
-
-            if (RepeatAfter.All(x => x == 0))
-                return date >= StarDate.Date && date <= EndDate.Date;
-
-            DateTime baseStart = StarDate.Date;
-            DateTime baseEnd = EndDate.Date;
-            TimeSpan duration = baseEnd - baseStart;
-
-            int cycleLength = RepeatAfter.Sum();
-
-            if (cycleLength == 0)
-                return date >= baseStart && date <= baseEnd;
-
-            int daysSinceStart = (date - baseStart).Days;
-            int fullCyclesPassed = Math.Max(0, daysSinceStart / cycleLength);
-
-            DateTime cycleStart = baseStart.AddDays(fullCyclesPassed * cycleLength);
-
-            DateTime currentStart = cycleStart;
-            DateTime currentEnd = currentStart + duration;
-
-            for (int i = 0; i < RepeatAfter.Count; i++)
-            {
-                if (date >= currentStart && date <= currentEnd)
-                    return true;
-
-                int offset = RepeatAfter[i];
-                currentStart = currentStart.AddDays(offset);
-                currentEnd = currentStart + duration;
-            }
-
-            return false;
-        }
-
-        private void OnPropertyChanged(string name) =>
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
-
+        #endregion
     }
 }
