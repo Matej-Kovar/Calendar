@@ -13,12 +13,9 @@ public class EventCreationViewModel : INotifyPropertyChanged
 {
     public event PropertyChangedEventHandler? PropertyChanged;
 
-    public DayEvent? OriginalEvent { get; set; }
+    public DayEventViewModel? OriginalEvent { get; set; }
 
-    public ObservableCollection<DayEvent> NewEvent { get; } = new()
-    {
-        new DayEvent(DateTime.Now, DateTime.Now, "")
-    };
+    public DayEventViewModel NewEvent { get; set; } = new DayEventViewModel(new DayEvent(DateTime.Now, DateTime.Now, ""));
 
     private DateTime startDate = DateTime.Now;
     public DateTime StartDate
@@ -33,7 +30,7 @@ public class EventCreationViewModel : INotifyPropertyChanged
 
                 startDate = value.Date + startDate.TimeOfDay;
                 OnPropertyChanged(nameof(StartDate));
-                NewEvent[0].StarDate = StartDate;
+                NewEvent.StarDate = StartDate;
             }
         }
     }
@@ -51,7 +48,7 @@ public class EventCreationViewModel : INotifyPropertyChanged
 
                 endDate = value.Date + endDate.TimeOfDay;
                 OnPropertyChanged(nameof(EndDate));
-                NewEvent[0].EndDate = EndDate;
+                NewEvent.EndDate = EndDate;
             }
         }
     }
@@ -68,7 +65,7 @@ public class EventCreationViewModel : INotifyPropertyChanged
 
                 startDate = startDate.Date + value.TimeOfDay;
                 OnPropertyChanged(nameof(StartTime));
-                NewEvent[0].StarDate = StartDate;
+                NewEvent.StarDate = StartDate;
             }
         }
     }
@@ -85,7 +82,7 @@ public class EventCreationViewModel : INotifyPropertyChanged
 
                 endDate = endDate.Date + value.TimeOfDay;
                 OnPropertyChanged(nameof(EndTime));
-                NewEvent[0].EndDate = EndDate;
+                NewEvent.EndDate = EndDate;
             }
         }
     }
@@ -178,7 +175,7 @@ public class EventCreationViewModel : INotifyPropertyChanged
         set
         {
             color = value;
-            NewEvent[0].Color = color;
+            NewEvent.Color = color;
             OnPropertyChanged(nameof(Color));
         }
     }
@@ -212,7 +209,7 @@ public class EventCreationViewModel : INotifyPropertyChanged
                     }
                 }
             }
-            var newEvent = new DayEvent(StartDate, EndDate, EventName)
+            var newEvent = new DayEventViewModel(new DayEvent(StartDate, EndDate, EventName))
             {
                 Place = EventPlace,
                 Description = EventDescription,
@@ -240,7 +237,7 @@ public class EventCreationViewModel : INotifyPropertyChanged
             EndDate = StartDate;
         }
 
-        if (query.TryGetValue("SelectedEvent", out var selectedEvent) && selectedEvent is DayEvent loadedEvent)
+        if (query.TryGetValue("SelectedEvent", out var selectedEvent) && selectedEvent is DayEventViewModel loadedEvent)
         {
             OriginalEvent = loadedEvent;
             Color = loadedEvent.Color;
@@ -248,7 +245,7 @@ public class EventCreationViewModel : INotifyPropertyChanged
             EndDate = loadedEvent.EndDate;
             StartTime = loadedEvent.StarDate;
             EndTime = loadedEvent.EndDate;
-            NewEvent[0] = loadedEvent;
+            NewEvent = loadedEvent;
             EventDescription = loadedEvent.Description;
             EventName = loadedEvent.Name;
             EventPlace = loadedEvent.Place;

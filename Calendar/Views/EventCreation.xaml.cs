@@ -35,6 +35,10 @@ public partial class EventCreation : ContentPage, IQueryAttributable
                 InvalidBorder(EventNameBorder);
             }
         };
+        viewModel.NewEvent.PropertyChanged += (s, e) =>
+        {
+            RenderInput();
+        };
         RenderInput();
     }
     public void RenderInput()
@@ -49,7 +53,7 @@ public partial class EventCreation : ContentPage, IQueryAttributable
                 {
                     FontSize = 14,
                     GenerateEvents = true,
-                    Events = viewModel.NewEvent,
+                    Events = new ObservableCollection<DayEventViewModel> { viewModel.NewEvent },
                     SelectedDay = SelectedInput == InputSelected.StartDate ? viewModel.StartDate : viewModel.EndDate
                 };
 

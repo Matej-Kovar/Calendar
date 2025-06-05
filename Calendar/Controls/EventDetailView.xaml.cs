@@ -1,10 +1,10 @@
-using Calendar.Models;
+using Calendar.ViewModels;
 
 namespace Calendar;
 
 public partial class EventDetailView : ContentView
 {
-	public DayEvent dayEvent { get; set; }
+	public DayEventViewModel dayEvent { get; set; }
 
     public string TimeRange
     {
@@ -32,7 +32,7 @@ public partial class EventDetailView : ContentView
             }
         }
     }
-    public EventDetailView(DayEvent dayEvent)
+    public EventDetailView(DayEventViewModel dayEvent)
 	{
 		this.dayEvent = dayEvent;
         InitializeComponent();

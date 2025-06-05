@@ -20,7 +20,7 @@ namespace Calendar
         private CalendarViewModel viewModel = new();
         public CalendarViewModel ViewModel => viewModel;
 
-        public ObservableCollection<DayEvent> Events
+        public ObservableCollection<DayEventViewModel> Events
         {
             get => ViewModel.Events;
             set
@@ -70,7 +70,7 @@ namespace Calendar
         private static void OnEventsChanged(BindableObject bindable, object oldValue, object newValue)
         {
             var calendar = (CalendarView)bindable;
-            calendar.Events = (ObservableCollection<DayEvent>)newValue;
+            calendar.Events = (ObservableCollection<DayEventViewModel>)newValue;
         }
 
         public bool GenerateEvents

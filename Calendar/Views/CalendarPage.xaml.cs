@@ -22,22 +22,22 @@ namespace Calendar
             set { selectdDay = value; UpdateEventList(); }
         }
 
-        DayEvent? selectedEvent;
+        DayEventViewModel? selectedEvent;
 
-        public DayEvent? SelectedEvent
+        public DayEventViewModel? SelectedEvent
         {
             get { return selectedEvent; }
             set { selectedEvent = value; OnAddButtonClicked(new object(), new EventArgs()); }
         }
 
-        public ObservableCollection<DayEvent> Events = new ObservableCollection<DayEvent>();
+        public ObservableCollection<DayEventViewModel> Events = new ObservableCollection<DayEventViewModel>();
 
         public CalendarPage()
         {
             InitializeComponent();
 
             var temp = LoadEvents(path);
-            foreach (DayEvent e in temp)
+            foreach (DayEventViewModel e in temp)
                 Events.Add(e);
 
             Calendar = new CalendarView
@@ -70,14 +70,19 @@ namespace Calendar
             });
         }
 
+        protected override void OnAppearing()
+        {
+            selectedEvent = null;
+            base.OnAppearing();
+        }
+
         public void ApplyQueryAttributes(IDictionary<string, object?> query)
         {
-            SelectedEvent = null;
-            if (query.TryGetValue("NewEvent", out var newObj) && newObj is DayEvent dayEvent)
+            if (query.TryGetValue("NewEvent", out var newObj) && newObj is DayEventViewModel dayEvent)
             {
                 bool replaced = false;
 
-                if (query.TryGetValue("OriginalEvent", out var origObj) && origObj is DayEvent originalEvent)
+                if (query.TryGetValue("OriginalEvent", out var origObj) && origObj is DayEventViewModel originalEvent)
                 {
                     int index = Events.IndexOf(originalEvent);
                     if (index >= 0)
@@ -96,7 +101,7 @@ namespace Calendar
             }
             else if (query.TryGetValue("Remove?", out var temp) && temp is bool remove)
             {
-                if (remove && query.TryGetValue("OriginalEvent", out var origObj) && origObj is DayEvent originalEvent)
+                if (remove && query.TryGetValue("OriginalEvent", out var origObj) && origObj is DayEventViewModel originalEvent)
                 {
                     Events.Remove(originalEvent);
                     UpdateCalendar();
@@ -132,7 +137,7 @@ namespace Calendar
             }
             else
             {
-                foreach (DayEvent dayEvent in selectedDay.Events)
+                foreach (DayEventViewModel dayEvent in selectedDay.Events)
                 {
                     var detail = new EventDetailView(dayEvent);
                     detail.GestureRecognizers.Add(new TapGestureRecognizer
@@ -144,21 +149,24 @@ namespace Calendar
             }
         }
 
-        public void OnEventSelected(DayEvent selectedEvent)
+        public void OnEventSelected(DayEventViewModel selectedEvent)
         {
             SelectedEvent = selectedEvent;
         }
 
-        public List<DayEvent> LoadEvents(string path)
+        public List<DayEventViewModel> LoadEvents(string path)
         {
-            List<DayEvent> loadedEvents = new List<DayEvent>();
-            if(/*File.Exists(path)*/false)
+            List<DayEventViewModel> loadedEvents = new List<DayEventViewModel>();
+            if(File.Exists(path))
             {
                 string json = File.ReadAllText(path);
                 var temp = JsonSerializer.Deserialize<List<DayEvent>>(json);;
                 if(temp != null)
                 {
-                    loadedEvents = temp;
+                    foreach(var dayEvent in temp)
+                    {
+                        loadedEvents.Add(new DayEventViewModel(dayEvent));
+                    }
                 }
             }
             return loadedEvents;
@@ -166,7 +174,7 @@ namespace Calendar
 
         public void SaveEvents(string path)
         {
-            var json = JsonSerializer.Serialize(Events.ToList()/*, new JsonSerializerOptions { WriteIndented = true }*/);
+            var json = JsonSerializer.Serialize(Events.Select(e => e.Model).ToList()/*, new JsonSerializerOptions { WriteIndented = true }*/);
             File.WriteAllTextAsync(path, json);
         }
     }

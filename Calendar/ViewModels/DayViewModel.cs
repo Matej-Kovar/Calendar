@@ -10,25 +10,25 @@ namespace Calendar.ViewModels
 {
     public class DayViewModel : INotifyPropertyChanged
     {
-        private readonly DayModel _model;
+        private readonly DayModel model;
 
-        public DateTime Date => _model.Date;
-        public List<DayEvent> Events => _model.Events;
+        public DateTime Date => model.Date;
+        public List<DayEventViewModel> Events => model.Events;
 
         public DayViewModel(DayModel model)
         {
-            _model = model;
+            this.model = model;
         }
 
-        private bool _isSelected;
+        private bool isSelected;
         public bool IsSelected
         {
-            get => _isSelected;
+            get => isSelected;
             set
             {
-                if (_isSelected != value)
+                if (isSelected != value)
                 {
-                    _isSelected = value;
+                    isSelected = value;
                     OnPropertyChanged(nameof(IsSelected));
                     OnPropertyChanged(nameof(Stroke));
                     OnPropertyChanged(nameof(StrokeThickness));
@@ -36,15 +36,15 @@ namespace Calendar.ViewModels
             }
         }
 
-        private bool _isToday;
+        private bool isToday;
         public bool IsToday
         {
-            get => _isToday;
+            get => isToday;
             set
             {
-                if (_isToday != value)
+                if (isToday != value)
                 {
-                    _isToday = value;
+                    isToday = value;
                     OnPropertyChanged(nameof(IsToday));
                     OnPropertyChanged(nameof(Background));
                 }

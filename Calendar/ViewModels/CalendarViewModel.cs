@@ -48,7 +48,7 @@ namespace Calendar.ViewModels
 
         public ObservableCollection<DayViewModel> Days { get; set; } = new();
 
-        public ObservableCollection<DayEvent> Events { get; set; } = new();
+        public ObservableCollection<DayEventViewModel> Events { get; set; } = new();
 
         public string[] DayNames { get; } = DateTimeFormatInfo.CurrentInfo.DayNames.Select(n => n.Substring(0, 3).ToUpper()).ToArray();
 
