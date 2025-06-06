@@ -14,7 +14,7 @@ namespace Calendar.Models
             StarDate = starDate;
             EndDate = endTime;
             Name = name;
-            Color temp = (Color)Application.Current.Resources["PrimaryColor"];
+            Color temp = (Color)Application.Current!.Resources["PrimaryColor"];
             ColorHex = temp.ToArgbHex();
         }
         public DayEvent() { }

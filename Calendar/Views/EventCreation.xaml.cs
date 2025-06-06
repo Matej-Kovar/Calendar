@@ -11,6 +11,7 @@ namespace Calendar;
 
 public partial class EventCreation : ContentPage, IQueryAttributable
 {
+    CalendarView calendarView { get; set; }
     public EventCreationViewModel viewModel { get; }
     public enum InputSelected { None, StartDate, EndDate, StartTime, EndTime, Color }
     public EventCreation()
@@ -18,6 +19,23 @@ public partial class EventCreation : ContentPage, IQueryAttributable
         viewModel = new EventCreationViewModel();
         BindingContext = viewModel;
         InitializeComponent();
+        calendarView = new CalendarView
+        {
+            FontSize = 14,
+            GenerateEvents = true,
+            Events = new ObservableCollection<DayEventViewModel> { viewModel.NewEvent },
+        };
+        calendarView.ViewModel.PropertyChanged += (s, e) =>
+        {
+            if (e.PropertyName == nameof(CalendarViewModel.SelectedDay))
+            {
+                if (SelectedInput == InputSelected.StartDate)
+                    viewModel.StartDate = calendarView.SelectedDay;
+                else
+                    viewModel.EndDate = calendarView.SelectedDay;
+            }
+        };
+
         EventName.SetBinding(Entry.TextProperty, new Binding(nameof(viewModel.EventName), source: viewModel, mode: BindingMode.TwoWay));
         EventDescription.SetBinding(Entry.TextProperty, new Binding(nameof(viewModel.EventDescription), source: viewModel, mode: BindingMode.TwoWay));
         EventPlace.SetBinding(Entry.TextProperty, new Binding(nameof(viewModel.EventPlace), source: viewModel, mode: BindingMode.TwoWay));
@@ -37,9 +55,10 @@ public partial class EventCreation : ContentPage, IQueryAttributable
         {
             if (!viewModel.IsInit)
             {
-                Debug.WriteLine($"Rendered Input on change of {e.PropertyName}");
-
-                RenderInput();
+                //Debug.WriteLine($"Rendered Input on change of {e.PropertyName}");
+                calendarView.Events = new ObservableCollection<DayEventViewModel> { viewModel.NewEvent };
+                //Dispatcher.Dispatch(() => calendarView.RenderCalendar());
+                
             }
         };
     }
@@ -53,25 +72,9 @@ public partial class EventCreation : ContentPage, IQueryAttributable
         {
             case InputSelected.StartDate:
             case InputSelected.EndDate:
-                var calendar = new CalendarView
-                {
-                    FontSize = 14,
-                    GenerateEvents = true,
-                    Events = new ObservableCollection<DayEventViewModel> { viewModel.NewEvent },
-                    SelectedDay = SelectedInput == InputSelected.StartDate ? viewModel.StartDate : viewModel.EndDate
-                };
-
-                calendar.ViewModel.PropertyChanged += (s, e) =>
-                {
-                    if (e.PropertyName == nameof(CalendarViewModel.SelectedDay))
-                    {
-                        if (SelectedInput == InputSelected.StartDate)
-                            viewModel.StartDate = calendar.SelectedDay;
-                        else
-                            viewModel.EndDate = calendar.SelectedDay;
-                    }
-                };
-                InputSection.Children.Add(calendar);
+                calendarView.SelectedDay = SelectedInput == InputSelected.StartDate ? viewModel.StartDate.Date : viewModel.EndDate.Date;
+                calendarView.RenderCalendar();
+                InputSection.Children.Add(calendarView);
                 break;
 
             case InputSelected.StartTime:
@@ -103,7 +106,7 @@ public partial class EventCreation : ContentPage, IQueryAttributable
             Enum.TryParse<InputSelected>(btn.CommandParameter?.ToString(), out var input))
         {
             SelectedInput = SelectedInput == input ? InputSelected.None : input;
-            Debug.WriteLine("Rendered input on Input selected");
+            //Debug.WriteLine("Rendered input on Input selected");
             RenderInput();
         }
     }
@@ -112,7 +115,7 @@ public partial class EventCreation : ContentPage, IQueryAttributable
     {
         var button = new Button
         {
-            Text = (string)Application.Current.Resources["TrashIcon"],
+            Text = (string)Application.Current!.Resources["TrashIcon"],
             Style = (Style)Application.Current.Resources["IconButton"]
         };
         button.Clicked += OnRemoveButtonClicked;
@@ -123,11 +126,11 @@ public partial class EventCreation : ContentPage, IQueryAttributable
 
     public void InvalidBorder(Border border)
     {
-        border.Stroke = (Color)Application.Current.Resources["Pink"];
+        border.Stroke = (Color)Application.Current!.Resources["Pink"];
         border.StrokeThickness = 3;
     }
 
-    public void OnRemoveButtonClicked(object sender, EventArgs e)
+    public void OnRemoveButtonClicked(object? sender, EventArgs e)
     {
         viewModel.RemoveEvent();
     }

@@ -58,12 +58,12 @@ namespace Calendar.ViewModels
         public bool IsCurrentMonth { get; set; }
 
         public Color Background =>
-            IsToday ? (Color)Application.Current.Resources["PrimaryColor"] :
+            IsToday ? (Color)Application.Current!.Resources["PrimaryColor"] :
             Colors.Transparent;
 
         public double Opacity => IsCurrentMonth ? 1 : 0.5;
 
-        public Brush Stroke => IsSelected ? (Color)Application.Current.Resources["SecondaryColor"] : Brush.Transparent;
+        public Brush Stroke => IsSelected ? (Color)Application.Current!.Resources["SecondaryColor"] : Brush.Transparent;
 
         public double StrokeThickness => IsSelected ? 3 : 1;
 

@@ -20,8 +20,8 @@ namespace Calendar
     {
         public static MauiApp CreateMauiApp()
         {
-            CultureInfo.CurrentUICulture = new CultureInfo("en");
-            CultureInfo.CurrentCulture = new CultureInfo("en-US");
+            //CultureInfo.CurrentUICulture = new CultureInfo("en");
+            //CultureInfo.CurrentCulture = new CultureInfo("en-US");
             var builder = MauiApp.CreateBuilder();
             builder
                 .UseMauiApp<App>()

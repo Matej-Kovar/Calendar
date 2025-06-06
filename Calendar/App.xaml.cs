@@ -9,7 +9,7 @@ namespace Calendar
         public App()
         {
             InitializeComponent();
-            LoadTheme(Application.Current.RequestedTheme);
+            LoadTheme(Application.Current!.RequestedTheme);
 
             Application.Current.RequestedThemeChanged += (s, e) =>
             {

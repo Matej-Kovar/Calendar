@@ -46,7 +46,7 @@ namespace Calendar
 
         public void RenderCalendar()
         {
-            Debug.WriteLine("Started calendar rendering");
+            //Debug.WriteLine("Started calendar rendering");
 
             calendarGrid.Children.Clear();
             calendarGrid.RowDefinitions.Clear();
@@ -82,7 +82,7 @@ namespace Calendar
                 Grid.SetRow(dayView, row);
                 Grid.SetColumn(dayView, col);
             }
-            Debug.WriteLine("Finished calendar rendering");
+            //Debug.WriteLine("Finished calendar rendering");
         }
 
         private static void OnSelectedDayChanged(BindableObject bindable, object oldValue, object newValue)
@@ -177,7 +177,7 @@ namespace Calendar
             var previousButton = new Button
             {
                 HorizontalOptions = LayoutOptions.End,
-                Text = (string)Application.Current.Resources["ArrowLeftIcon"],
+                Text = (string)Application.Current!.Resources["ArrowLeftIcon"],
                 BindingContext = viewModel,
                 Style = (Style)Application.Current!.Resources["IconButton"],
                 HeightRequest = FontSize * 2.25,

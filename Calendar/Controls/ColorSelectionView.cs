@@ -34,7 +34,7 @@ public class ColorSelectionView : ContentView
                 Fill = color,
                 HeightRequest = 48,
                 WidthRequest = 48,
-                Stroke = SelectedColor == color ? (Color)Application.Current.Resources["TextColor"] : Microsoft.Maui.Graphics.Colors.Transparent,
+                Stroke = SelectedColor == color ? (Color)Application.Current!.Resources["TextColor"] : Microsoft.Maui.Graphics.Colors.Transparent,
                 StrokeThickness = 4,
                 RadiusX = 8,
                 RadiusY = 8,

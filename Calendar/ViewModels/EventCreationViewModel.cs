@@ -20,7 +20,7 @@ namespace Calendar.ViewModels
         private string eventDescription = string.Empty;
         private string eventPlace = string.Empty;
         private string eventRepeatAfter = string.Empty;
-        private Color color = (Color)Application.Current.Resources["Blue"];
+        private Color color = (Color)Application.Current!.Resources["Blue"];
         private bool isInit = false;
         #endregion
 
@@ -84,9 +84,9 @@ namespace Calendar.ViewModels
                 StartTime = loadedEvent.StarDate;
                 EndTime = loadedEvent.EndDate;
                 //NewEvent = loadedEvent;
-                EventDescription = loadedEvent.Description;
-                EventName = loadedEvent.Name;
-                EventPlace = loadedEvent.Place;
+                EventDescription = loadedEvent.Description is null ? string.Empty : loadedEvent.Description;
+                EventName = loadedEvent.Name is null ? string.Empty : loadedEvent.Name;
+                EventPlace = loadedEvent.Place is null ? string.Empty : loadedEvent.Place;
                 string temp = string.Empty;
                 foreach (int i in loadedEvent.RepeatAfter)
                 {

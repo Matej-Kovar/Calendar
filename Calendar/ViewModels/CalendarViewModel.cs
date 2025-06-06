@@ -51,7 +51,7 @@ namespace Calendar.ViewModels
                 var dayModel = new DayModel
                 {
                     Date = date,
-                    Events = Events.Select(e => e.GetEvent(date)).Where(e => e is not null).ToList()
+                    Events = Events.Select(e => e.GetEvent(date)).Where(e => e is not null).Select(e => e!).ToList()
                 };
 
                 Days.Add(new DayViewModel(dayModel)
@@ -124,7 +124,7 @@ namespace Calendar.ViewModels
 
         public string[] DayNames { get; }
         
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
         #endregion
     }
 }
