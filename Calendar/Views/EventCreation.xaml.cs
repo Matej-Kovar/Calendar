@@ -35,9 +35,13 @@ public partial class EventCreation : ContentPage, IQueryAttributable
         };
         viewModel.NewEvent.PropertyChanged += (s, e) =>
         {
-            RenderInput();
+            if (!viewModel.IsInit)
+            {
+                Debug.WriteLine($"Rendered Input on change of {e.PropertyName}");
+
+                RenderInput();
+            }
         };
-        RenderInput();
     }
 
     #region public methods
@@ -99,6 +103,7 @@ public partial class EventCreation : ContentPage, IQueryAttributable
             Enum.TryParse<InputSelected>(btn.CommandParameter?.ToString(), out var input))
         {
             SelectedInput = SelectedInput == input ? InputSelected.None : input;
+            Debug.WriteLine("Rendered input on Input selected");
             RenderInput();
         }
     }

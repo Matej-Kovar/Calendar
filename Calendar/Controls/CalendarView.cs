@@ -24,6 +24,7 @@ namespace Calendar
 
         public static readonly BindableProperty FontSizeProperty =
             BindableProperty.Create(nameof(FontSize), typeof(double), typeof(CalendarView), 16.0);
+
         public CalendarView()
         {
             BindingContext = viewModel;
@@ -88,12 +89,6 @@ namespace Calendar
         {
             var calendar = (CalendarView)bindable;
             calendar.viewModel.ControlDate = calendar.viewModel.SelectedDay.Date;
-        }
-
-        private static void OnEventsChanged(BindableObject bindable, object oldValue, object newValue)
-        {
-            var calendar = (CalendarView)bindable;
-            calendar.Events = (ObservableCollection<DayEventViewModel>)newValue;
         }
 
         View RenderDay(DayViewModel day)
@@ -221,6 +216,7 @@ namespace Calendar
             return layout;
         }
 
+        #region public properties
         public CalendarViewModel ViewModel => viewModel;
 
         public ObservableCollection<DayEventViewModel> Events
@@ -251,5 +247,6 @@ namespace Calendar
             get => (double)GetValue(FontSizeProperty);
             set => SetValue(FontSizeProperty, value);
         }
+        #endregion
     }
 }

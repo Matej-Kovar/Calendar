@@ -16,7 +16,6 @@ public partial class EventDetailView : ContentView
 
     }
     public DayEventViewModel dayEvent { get; set; }
-
     public string TimeRange
     {
         get

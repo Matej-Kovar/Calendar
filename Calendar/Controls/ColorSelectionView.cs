@@ -6,17 +6,16 @@ public class ColorSelectionView : ContentView
 {
 	FlexLayout flex = new FlexLayout();
 
-	public List<Color> colors;
     public static readonly BindableProperty SelectedColorProperty =
     BindableProperty.Create(
         nameof(SelectedColor),
         typeof(Color),
         typeof(ColorSelectionView),
-        Colors.Transparent,
-		BindingMode.TwoWay);
+        Microsoft.Maui.Graphics.Colors.Transparent,
+        BindingMode.TwoWay);
     public ColorSelectionView(List<Color> colors)
     {
-        this.colors = colors;
+        this.Colors = colors;
         Content = flex;
         RenderColorSelection();
     }
@@ -28,14 +27,14 @@ public class ColorSelectionView : ContentView
         flex.Padding = 8;
         flex.HorizontalOptions = LayoutOptions.Center;
         flex.VerticalOptions = LayoutOptions.Center;
-        foreach (var color in colors)
+        foreach (var color in Colors)
         {
             var rect = new Rectangle
             {
                 Fill = color,
                 HeightRequest = 48,
                 WidthRequest = 48,
-                Stroke = SelectedColor == color ? (Color)Application.Current.Resources["TextColor"] : Colors.Transparent,
+                Stroke = SelectedColor == color ? (Color)Application.Current.Resources["TextColor"] : Microsoft.Maui.Graphics.Colors.Transparent,
                 StrokeThickness = 4,
                 RadiusX = 8,
                 RadiusY = 8,
@@ -55,6 +54,7 @@ public class ColorSelectionView : ContentView
         RenderColorSelection();
     }
 
+    public List<Color> Colors;
     public Color SelectedColor
     {
         get => (Color)GetValue(SelectedColorProperty);

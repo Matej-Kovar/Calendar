@@ -76,6 +76,12 @@ namespace Calendar.ViewModels
 
         private void OnPropertyChanged([CallerMemberName] string name = "") =>
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        /*private static void OnEventsChanged(BindableObject bindable, object oldValue, object newValue)
+        {
+            var calendar = (CalendarView)bindable;
+            calendar.Events = (ObservableCollection<DayEventViewModel>)newValue;
+            calendar.RenderCalendar();
+        }*/
 
         public ICommand NextMonthCommand { get; }
         public ICommand PreviousMonthCommand { get; }

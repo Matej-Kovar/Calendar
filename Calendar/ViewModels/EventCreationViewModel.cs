@@ -21,6 +21,7 @@ namespace Calendar.ViewModels
         private string eventPlace = string.Empty;
         private string eventRepeatAfter = string.Empty;
         private Color color = (Color)Application.Current.Resources["Blue"];
+        private bool isInit = false;
         #endregion
 
         #region public methods
@@ -67,6 +68,7 @@ namespace Calendar.ViewModels
         public void ApplyQueryAttributes(IDictionary<string, object> query)
         {
             IsModifying = false;
+            isInit = true;
             if (query.TryGetValue("SelectedDate", out var selectedDate))
             {
                 StartDate = (DateTime)selectedDate;
@@ -98,6 +100,7 @@ namespace Calendar.ViewModels
                 IsModifying = true;
             }
             query.Clear();
+            isInit = false;
         }
         public async void NavigateBack()
         {
@@ -119,6 +122,13 @@ namespace Calendar.ViewModels
         public event PropertyChangedEventHandler? PropertyChanged;
         public DayEventViewModel? OriginalEvent { get; set; }
         public DayEventViewModel NewEvent { get; set; } = new DayEventViewModel(new DayEvent(DateTime.Now, DateTime.Now, ""));
+
+        public bool IsInit
+        {
+            get => isInit;
+            set => isInit = value;
+        }
+
         public DateTime StartDate
         {
             get => startDate;
