@@ -1,4 +1,5 @@
 ﻿using Calendar.Models;
+using Microsoft.Maui.Platform;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -17,6 +18,10 @@ namespace Calendar.ViewModels
 
         public CalendarViewModel()
         {
+            var format = CultureInfo.CurrentCulture.DateTimeFormat;
+            var firstDay = (int)format.FirstDayOfWeek;
+            var dayNames = format.DayNames;
+            DayNames = dayNames.Skip(firstDay).Concat(dayNames.Take(firstDay)).Select(n => n.Substring(0, 3).ToUpper()).ToArray();
             NextMonthCommand = new Command(() => ControlDate = ControlDate.AddMonths(1));
             PreviousMonthCommand = new Command(() => ControlDate = ControlDate.AddMonths(-1));
             LoadMonth();
@@ -25,16 +30,22 @@ namespace Calendar.ViewModels
         #region public methods
         public void LoadMonth()
         {
+            var culture = CultureInfo.CurrentCulture;
+            var firstDayOfWeek = culture.DateTimeFormat.FirstDayOfWeek;
+
             var month = ControlDate;
             Days.Clear();
+
             var firstOfMonth = new DateTime(month.Year, month.Month, 1);
             var lastOfMonth = new DateTime(month.Year, month.Month, DateTime.DaysInMonth(month.Year, month.Month));
-            int offsetBefore = (int)firstOfMonth.DayOfWeek;
-            int offsetAfter = 7 - (int)lastOfMonth.DayOfWeek;
-            var startDate = firstOfMonth.AddDays(-offsetBefore);
-            int total = DateTime.DaysInMonth(month.Year, month.Month) + offsetAfter + offsetBefore - 1;
 
-            for (int i = 0; i < total; i++)
+            int offsetBefore = ((int)firstOfMonth.DayOfWeek - (int)firstDayOfWeek + 7) % 7;
+            int offsetAfter = (7 - ((int)lastOfMonth.DayOfWeek - (int)firstDayOfWeek + 1) % 7) % 7;
+
+            var startDate = firstOfMonth.AddDays(-offsetBefore);
+            int totalDays = DateTime.DaysInMonth(month.Year, month.Month) + offsetBefore + offsetAfter;
+
+            for (int i = 0; i < totalDays; i++)
             {
                 var date = startDate.AddDays(i);
                 var dayModel = new DayModel
@@ -105,7 +116,7 @@ namespace Calendar.ViewModels
 
         public ObservableCollection<DayEventViewModel> Events { get; set; } = new();
 
-        public string[] DayNames { get; } = DateTimeFormatInfo.CurrentInfo.DayNames.Select(n => n.Substring(0, 3).ToUpper()).ToArray();
+        public string[] DayNames { get; }
         
         public event PropertyChangedEventHandler PropertyChanged;
         #endregion
